@@ -1,8 +1,6 @@
 'use client'
 
-import { Server, Database, StopCircle } from 'lucide-react';
-
-export const WaitingForSolution = () => (
+export const WaitingForReport = () => (
   <div className="flex-1 overflow-hidden flex flex-col items-center justify-center p-6 relative z-0">
     <div className="w-full max-w-lg flex flex-col items-center text-center gap-2 animate-in fade-in duration-500">
       
@@ -10,7 +8,7 @@ export const WaitingForSolution = () => (
       <div className="h-32 flex items-center justify-center gap-2.5">
         {[0, 0.1, 0.2, 0.3, 0.4].map((delay, i) => (
           <div 
-            key={i} 
+            key={i}
             className="w-2 h-8 bg-linear-to-t from-foreground/50 to-foreground rounded-full animate-wave" 
             style={{ animationDelay: `${delay}s` }} 
           />
@@ -19,7 +17,7 @@ export const WaitingForSolution = () => (
 
       <div className="space-y-1 relative">
         <p className="text-neutral-500 text-sm max-w-xs mx-auto leading-relaxed">
-          waiting for a comprehensive solution. This may take a moment.
+          waiting for a comprehensive report from conductors...
         </p>
       </div>
 

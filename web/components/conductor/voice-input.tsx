@@ -6,9 +6,10 @@ import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 
 interface VoiceInputProps {
   onTranscript: (text: string) => void;
+  onStop?: () => void;
 }
 
-export function VoiceInput({ onTranscript }: VoiceInputProps) {
+export function VoiceInput({ onTranscript, onStop }: VoiceInputProps) {
   const [waveIntensity, setWaveIntensity] = useState(0);
 
   const {
@@ -43,6 +44,12 @@ export function VoiceInput({ onTranscript }: VoiceInputProps) {
     if (error) {
       clearError();
     }
+    
+    // If we're currently recording and about to stop, call onStop
+    if (isRecording) {
+      onStop?.();
+    }
+    
     toggleRecording();
   };
 

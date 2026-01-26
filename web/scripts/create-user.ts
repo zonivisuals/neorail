@@ -19,14 +19,14 @@ async function createUser() {
       },
     });
 
-    console.log('✅ User created successfully:');
+    console.log('User created successfully:');
     console.log({
       id: user.id,
       email: user.email,
       role: user.role,
     });
   } catch (error: any) {
-    console.error('❌ Error creating user:', error.message);
+    console.error('Error creating user:', error.message);
   } finally {
     await prisma.$disconnect();
   }
