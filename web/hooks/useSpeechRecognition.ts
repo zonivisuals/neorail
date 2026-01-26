@@ -99,8 +99,13 @@ export function useSpeechRecognition(
   const isRecordingRef = useRef(false);
   const shouldRestartRef = useRef(false);
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const onTranscriptChangeRef = useRef(onTranscriptChange);
 
-  // Keep refs in sync with state
+  // Keep refs in sync with props and state
+  useEffect(() => {
+    onTranscriptChangeRef.current = onTranscriptChange;
+  }, [onTranscriptChange]);
+
   useEffect(() => {
     isRecordingRef.current = isRecording;
   }, [isRecording]);
@@ -166,7 +171,7 @@ export function useSpeechRecognition(
       if (fullTranscript.trim()) {
         console.log(`[useSpeechRecognition] Transcript updated: "${fullTranscript.trim()}"`);
         setTranscript(fullTranscript);
-        onTranscriptChange?.(fullTranscript);
+        onTranscriptChangeRef.current?.(fullTranscript);
       }
     };
 
@@ -297,11 +302,16 @@ export function useSpeechRecognition(
         hasPendingRetry: !!retryTimeoutRef.current,
       });
       
+      // CRITICAL: Check refs first (they're always up-to-date), not state
       // Don't auto-restart if:
       // 1. User stopped recording (!isRecordingRef.current)
       // 2. We shouldn't restart (!shouldRestartRef.current)
       // 3. There's a pending retry timeout (retryTimeoutRef.current)
-      if (isRecordingRef.current && shouldRestartRef.current && !retryTimeoutRef.current) {
+      const shouldAutoRestart = isRecordingRef.current && 
+                                shouldRestartRef.current && 
+                                !retryTimeoutRef.current;
+      
+      if (shouldAutoRestart) {
         console.log('[useSpeechRecognition] Auto-restarting recognition...');
         try {
           recognition.start();
@@ -314,7 +324,7 @@ export function useSpeechRecognition(
         if (retryTimeoutRef.current) {
           console.log('[useSpeechRecognition] Not restarting - retry timeout is pending');
         } else if (!shouldRestartRef.current) {
-          console.log('[useSpeechRecognition] Not restarting - shouldRestart is false');
+          console.log('[useSpeechRecognition] Not restarting - shouldRestart is false (user stopped or error occurred)');
         } else if (!isRecordingRef.current) {
           console.log('[useSpeechRecognition] Not restarting - user stopped recording');
         }
@@ -354,7 +364,8 @@ export function useSpeechRecognition(
         }
       }
     };
-  }, [language, continuous, interimResults, maxRetries, onTranscriptChange]);
+  }, [language, continuous, interimResults, maxRetries]);
+  // Removed onTranscriptChange from dependencies to prevent re-initialization
 
   const startRecording = useCallback(() => {
     if (!recognitionRef.current) {
@@ -410,19 +421,28 @@ export function useSpeechRecognition(
   }, []);
 
   const stopRecording = useCallback(() => {
-    console.log('[useSpeechRecognition] Stopping recording...');
+    console.log('[useSpeechRecognition] User manually stopping recording...');
+    
+    // Set flags FIRST to prevent any auto-restart
     shouldRestartRef.current = false;
+    isRecordingRef.current = false;
     setIsRecording(false);
 
     // Clear any pending retry timeout
     if (retryTimeoutRef.current) {
+      console.log('[useSpeechRecognition] Clearing pending retry timeout');
       clearTimeout(retryTimeoutRef.current);
       retryTimeoutRef.current = null;
     }
 
+    // Clear retry count and error
+    setRetryCount(0);
+    setError(null);
+
     if (recognitionRef.current) {
       try {
         recognitionRef.current.stop();
+        console.log('[useSpeechRecognition] Recognition stopped successfully');
       } catch (e) {
         console.error('[useSpeechRecognition] Error stopping:', e);
       }
@@ -440,8 +460,8 @@ export function useSpeechRecognition(
   const clearTranscript = useCallback(() => {
     console.log('[useSpeechRecognition] Clearing transcript');
     setTranscript('');
-    onTranscriptChange?.('');
-  }, [onTranscriptChange]);
+    onTranscriptChangeRef.current?.('');
+  }, []);
 
   const clearError = useCallback(() => {
     console.log('[useSpeechRecognition] Clearing error');

@@ -77,7 +77,7 @@ async def get_positions():
 async def trigger_incident(train_id: str):
     for t in trains:
         if t["id"] == train_id:
-            t["status"] = "⚠️ STUCK: DEBRIS"
+            t["status"] = "STUCK: DEBRIS"
             t["speed"] = 0
     return {"status": "Incident Triggered"}
 

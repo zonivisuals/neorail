@@ -1,16 +1,34 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { InputPanel } from './input-panel';
 import { VoiceInput } from './voice-input';
-import { SpeechDiagnostics } from './speech-diagnostics';
 
 export function MainContent() {
   const [inputMessage, setInputMessage] = useState('');
-  const [showDiagnostics, setShowDiagnostics] = useState(false);
+  const baseMessageRef = useRef(''); // The text before starting voice input
 
   const handleVoiceTranscript = (text: string) => {
-    setInputMessage(text);
+    // When voice input starts, capture the existing message as the base
+    // Then always append the current transcript to that base
+    setInputMessage(prevMessage => {
+      // If baseMessageRef is empty, this is the first transcript - store the base
+      if (!baseMessageRef.current) {
+        baseMessageRef.current = prevMessage;
+      }
+      
+      // Always combine base message with current transcript
+      const newMessage = baseMessageRef.current 
+        ? `${baseMessageRef.current} ${text}`.trim()
+        : text;
+      
+      return newMessage;
+    });
+  };
+
+  const handleVoiceStop = () => {
+    // Reset the base when voice recording stops
+    baseMessageRef.current = '';
   };
 
   return (
@@ -19,26 +37,12 @@ export function MainContent() {
         {/* Title & Subheader */}
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-semibold text-white tracking-tight">
-            Report Operational Anomaly
+            Report Operational Incident
           </h1>
-          <p className="text-neutral-500 text-sm max-w-md mx-auto">
-            Detected a hazard? Submit multimodal evidence immediately to Central Command for AI analysis.
-          </p>
         </div>
 
-        {/* Diagnostics Toggle */}
-        <button
-          onClick={() => setShowDiagnostics(!showDiagnostics)}
-          className="text-xs text-neutral-400 hover:text-neutral-300 underline mx-auto"
-        >
-          {showDiagnostics ? 'Hide' : 'Show'} Speech Recognition Diagnostics
-        </button>
-
-        {/* Diagnostics Panel */}
-        {showDiagnostics && <SpeechDiagnostics />}
-
         {/* Voice Input Component */}
-        <VoiceInput onTranscript={handleVoiceTranscript} />
+        <VoiceInput onTranscript={handleVoiceTranscript} onStop={handleVoiceStop} />
 
         {/* or seperator */}
         <div className="flex items-center w-full">
