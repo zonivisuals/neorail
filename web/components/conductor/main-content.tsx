@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { InputPanel } from './input-panel';
 import { VoiceInput } from './voice-input';
+import { SpeechDiagnostics } from './speech-diagnostics';
 
 export function MainContent() {
   const [inputMessage, setInputMessage] = useState('');
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
 
   const handleVoiceTranscript = (text: string) => {
     setInputMessage(text);
@@ -23,6 +25,17 @@ export function MainContent() {
             Detected a hazard? Submit multimodal evidence immediately to Central Command for AI analysis.
           </p>
         </div>
+
+        {/* Diagnostics Toggle */}
+        <button
+          onClick={() => setShowDiagnostics(!showDiagnostics)}
+          className="text-xs text-neutral-400 hover:text-neutral-300 underline mx-auto"
+        >
+          {showDiagnostics ? 'Hide' : 'Show'} Speech Recognition Diagnostics
+        </button>
+
+        {/* Diagnostics Panel */}
+        {showDiagnostics && <SpeechDiagnostics />}
 
         {/* Voice Input Component */}
         <VoiceInput onTranscript={handleVoiceTranscript} />

@@ -1,126 +1,31 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Mic, AlertCircle } from 'lucide-react';
+import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 
 interface VoiceInputProps {
   onTranscript: (text: string) => void;
 }
 
 export function VoiceInput({ onTranscript }: VoiceInputProps) {
-  const [isRecording, setIsRecording] = useState(false);
-  const [transcript, setTranscript] = useState('');
-  const recognitionRef = useRef<any>(null);
   const [waveIntensity, setWaveIntensity] = useState(0);
-  const [error, setError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
-  const maxRetries = 3;
 
-  useEffect(() => {
-    // Check if browser supports Speech Recognition
-    if (typeof window !== 'undefined') {
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      
-      if (!SpeechRecognition) {
-        setError('Speech recognition is not supported in this browser. Please use Chrome or Edge.');
-        return;
-      }
-
-      recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.continuous = true;
-      recognitionRef.current.interimResults = true;
-      recognitionRef.current.lang = 'en-US';
-
-      recognitionRef.current.onstart = () => {
-        setIsRecording(true);
-        setError(null);
-        setRetryCount(0);
-      };
-
-      recognitionRef.current.onresult = (event: any) => {
-        let interimTranscript = '';
-        let finalTranscript = '';
-
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcriptText = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            finalTranscript += transcriptText + ' ';
-          } else {
-            interimTranscript += transcriptText;
-          }
-        }
-
-        const fullTranscript = finalTranscript + interimTranscript;
-        setTranscript(fullTranscript);
-        onTranscript(fullTranscript);
-      };
-
-      recognitionRef.current.onerror = (event: any) => {
-        console.error('Speech recognition error:', event.error);
-        
-        // Handle different error types
-        if (event.error === 'network') {
-          if (retryCount < maxRetries) {
-            setError(`Network error. Retrying... (${retryCount + 1}/${maxRetries})`);
-            setRetryCount(prev => prev + 1);
-            
-            // Retry after a short delay
-            setTimeout(() => {
-              if (recognitionRef.current) {
-                try {
-                  recognitionRef.current.start();
-                } catch (e) {
-                  console.error('Failed to restart:', e);
-                }
-              }
-            }, 1000);
-          } else {
-            setError('Network error. Please check your internet connection and try again.');
-            setIsRecording(false);
-          }
-        } else if (event.error === 'not-allowed') {
-          setError('Microphone access denied. Please allow microphone permissions.');
-          setIsRecording(false);
-        } else if (event.error === 'no-speech') {
-          // Restart automatically on no-speech
-          if (isRecording) {
-            try {
-              recognitionRef.current.start();
-            } catch (e) {
-              console.error('Failed to restart after no-speech:', e);
-            }
-          }
-        } else {
-          setError(`Error: ${event.error}. Please try again.`);
-          setIsRecording(false);
-        }
-      };
-
-      recognitionRef.current.onend = () => {
-        // Auto-restart if still supposed to be recording
-        if (isRecording && retryCount < maxRetries) {
-          try {
-            recognitionRef.current.start();
-          } catch (e) {
-            console.error('Failed to restart:', e);
-            setIsRecording(false);
-          }
-        } else {
-          setIsRecording(false);
-        }
-      };
-    }
-
-    return () => {
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.stop();
-        } catch (e) {
-          console.error('Error stopping recognition:', e);
-        }
-      }
-    };
-  }, [isRecording, retryCount]);
+  const {
+    isRecording,
+    transcript,
+    error,
+    retryCount,
+    isSupported,
+    toggleRecording,
+    clearError,
+  } = useSpeechRecognition({
+    language: 'en-US',
+    continuous: true,
+    interimResults: true,
+    maxRetries: 3,
+    onTranscriptChange: onTranscript,
+  });
 
   // Simulate wave intensity animation
   useEffect(() => {
@@ -134,33 +39,11 @@ export function VoiceInput({ onTranscript }: VoiceInputProps) {
     }
   }, [isRecording]);
 
-  const toggleRecording = () => {
-    if (!recognitionRef.current) {
-      setError('Speech recognition is not supported in this browser. Please use Chrome or Edge.');
-      return;
+  const handleToggleRecording = () => {
+    if (error) {
+      clearError();
     }
-
-    if (isRecording) {
-      try {
-        recognitionRef.current.stop();
-        setIsRecording(false);
-      } catch (e) {
-        console.error('Error stopping recording:', e);
-      }
-    } else {
-      setTranscript('');
-      onTranscript('');
-      setError(null);
-      setRetryCount(0);
-      
-      try {
-        recognitionRef.current.start();
-        setIsRecording(true);
-      } catch (e) {
-        console.error('Error starting recording:', e);
-        setError('Failed to start recording. Please try again.');
-      }
-    }
+    toggleRecording();
   };
 
   return (
@@ -194,12 +77,14 @@ export function VoiceInput({ onTranscript }: VoiceInputProps) {
 
             {/* Main Mic Button */}
             <button
-              onClick={toggleRecording}
+              onClick={handleToggleRecording}
+              disabled={!isSupported}
               className={`relative w-36 h-36 rounded-full flex items-center justify-center transition-all duration-300 ${
+                !isSupported ? 'bg-gray-500/10 cursor-not-allowed' :
                 error ? 'bg-red-500/10' : 'bg-foreground/5'
               }`}
             >
-              <Mic size={54} className={error ? "text-red-400" : "text-white"} />
+              <Mic size={54} className={error ? "text-red-400" : isSupported ? "text-white" : "text-gray-500"} />
             </button>
           </div>
 
@@ -238,7 +123,7 @@ export function VoiceInput({ onTranscript }: VoiceInputProps) {
             </div>
             {retryCount > 0 && (
               <span className="text-yellow-400">
-                Retry {retryCount}/{maxRetries}
+                Retry {retryCount}/3
               </span>
             )}
           </div>
