@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react';
-import { Mic, Image as ImageIcon, Cpu, Send, X } from 'lucide-react';
+import { useState, useRef, useEffect, useTransition } from 'react';
+import { Mic, Image as ImageIcon, Cpu, Send, X, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { VoiceInput } from './voice-input';
+import { createReport } from '@/app/actions/createReport';
 
 interface UploadedImage {
   id: string;
@@ -20,6 +21,13 @@ export function InputPanel({ message, onMessageChange }: InputPanelProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+  const [location, setLocation] = useState('');
+  const [urgency, setUrgency] = useState<'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'>('MEDIUM');
+  const [isPending, startTransition] = useTransition();
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: 'success' | 'error' | null;
+    message: string;
+  }>({ type: null, message: '' });
 
   const removeImage = (id: string) => {
     setUploadedImages(uploadedImages.filter((img) => img.id !== id));
@@ -73,20 +81,131 @@ export function InputPanel({ message, onMessageChange }: InputPanelProps) {
     onMessageChange(e.target.value);
   };
 
+  const handleSubmit = async () => {
+    // Validation
+    if (!message.trim()) {
+      setSubmitStatus({
+        type: 'error',
+        message: 'Please enter a report description',
+      });
+      return;
+    }
+
+    if (!location.trim()) {
+      setSubmitStatus({
+        type: 'error',
+        message: 'Please enter a location',
+      });
+      return;
+    }
+
+    // Clear previous status
+    setSubmitStatus({ type: null, message: '' });
+
+    startTransition(async () => {
+      try {
+        // Convert images to base64 URLs (already done by FileReader)
+        const imageUrls = uploadedImages.map(img => img.url);
+
+        // Create FormData
+        const formData = new FormData();
+        formData.append('content', message.trim());
+        formData.append('location', location.trim());
+        formData.append('urgency', urgency);
+
+        // Call server action
+        const result = await createReport(formData, imageUrls);
+
+        if (result.success) {
+          setSubmitStatus({
+            type: 'success',
+            message: `Report created successfully! ID: ${result.reportId}`,
+          });
+
+          // Clear form
+          onMessageChange('');
+          setLocation('');
+          setUrgency('MEDIUM');
+          setUploadedImages([]);
+
+          // Clear success message after 3 seconds
+          setTimeout(() => {
+            setSubmitStatus({ type: null, message: '' });
+          }, 3000);
+        } else {
+          setSubmitStatus({
+            type: 'error',
+            message: result.error,
+          });
+        }
+      } catch (error) {
+        console.error('Submit error:', error);
+        setSubmitStatus({
+          type: 'error',
+          message: 'Failed to submit report. Please try again.',
+        });
+      }
+    });
+  };
+
   return (
     <>
       
       <div className="w-full relative group">
+      {/* Status Messages */}
+      {submitStatus.type && (
+        <div
+          className={`mb-3 p-3 rounded-lg flex items-center gap-2 text-sm ${
+            submitStatus.type === 'success'
+              ? 'bg-green-500/10 border border-green-500/20 text-green-400'
+              : 'bg-red-500/10 border border-red-500/20 text-red-400'
+          }`}
+        >
+          {submitStatus.type === 'success' ? (
+            <CheckCircle2 size={16} />
+          ) : (
+            <AlertCircle size={16} />
+          )}
+          <span>{submitStatus.message}</span>
+        </div>
+      )}
+
       <div className="relative bg-background/50 border-2 rounded-2xl p-2 transition-all duration-300">
+        {/* Location & Urgency Fields */}
+        <div className="px-4 pt-4 pb-2 space-y-3">
+          <div className="flex gap-3">
+            <input
+              type="text"
+              placeholder="Location (e.g., Platform 5, Track 2)"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              disabled={isPending}
+              className="flex-1 bg-white/5 text-sm text-white placeholder-neutral-600 px-3 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-white/20 disabled:opacity-50"
+            />
+            <select
+              value={urgency}
+              onChange={(e) => setUrgency(e.target.value as any)}
+              disabled={isPending}
+              className="bg-white/5 text-sm text-white px-3 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-white/20 disabled:opacity-50"
+            >
+              <option value="LOW" className="bg-neutral-900">Low</option>
+              <option value="MEDIUM" className="bg-neutral-900">Medium</option>
+              <option value="HIGH" className="bg-neutral-900">High</option>
+              <option value="CRITICAL" className="bg-neutral-900">Critical</option>
+            </select>
+          </div>
+        </div>
+
         {/* Text Input Area */}
         <div className="p-4 pb-2">
           <textarea
             ref={textareaRef}
-            placeholder="Type your message here..."
+            placeholder="Describe the incident in detail..."
             value={message}
             onChange={handleInputChange}
+            disabled={isPending}
             rows={1}
-            className="w-full bg-transparent text-md text-white placeholder-neutral-600 focus:outline-none resize-none leading-relaxed font-light scrollbar-none"
+            className="w-full bg-transparent text-md text-white placeholder-neutral-600 focus:outline-none resize-none leading-relaxed font-light scrollbar-none disabled:opacity-50"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           />
         </div>
@@ -117,9 +236,22 @@ export function InputPanel({ message, onMessageChange }: InputPanelProps) {
           </div>
 
           {/* Send Button */}
-          <button className="ml-auto bg-white text-black hover:bg-neutral-200 px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 shadow-[0_0_10px_rgba(255,255,255,0.15)]">
-            <span>Send</span>
-            <Send size={16} />
+          <button
+            onClick={handleSubmit}
+            disabled={isPending || !message.trim() || !location.trim()}
+            className="ml-auto bg-white text-black hover:bg-neutral-200 px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 shadow-[0_0_10px_rgba(255,255,255,0.15)] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isPending ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                <span>Submitting...</span>
+              </>
+            ) : (
+              <>
+                <span>Send Report</span>
+                <Send size={16} />
+              </>
+            )}
           </button>
         </div>
 

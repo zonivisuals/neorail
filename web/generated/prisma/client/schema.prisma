@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  CONDUCTOR
+}
+
+enum Status {
+  OPEN
+  ANALYZING
+  RESOLVED
+}
+
+enum Urgency {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model User {
+  id       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email    String   @unique
+  password String
+  role     UserRole @default(CONDUCTOR)
+  name     String?
+
+  trainId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reports  Report[] @relation("Reporter")
+  resolved Report[] @relation("Resolver")
+}
+
+model Report {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // input
+  content  String
+  imageUrl String[]
+  location String
+
+  trainId String?
+
+  urgency Urgency @default(MEDIUM)
+  status  Status  @default(OPEN)
+
+  // output
+  solution Solution?
+
+  // relations
+  conductorId String @db.Uuid
+  conductor   User   @relation("Reporter", fields: [conductorId], references: [id])
+
+  adminId String? @db.Uuid
+  admin   User?   @relation("Resolver", fields: [adminId], references: [id])
+}
+
+model Solution {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt DateTime @default(now())
+
+  title String
+  steps String
+
+  source      String
+  confidence  Float?
+  isGoldenRun Boolean @default(false)
+
+  // relations
+  reportId String @unique @db.Uuid
+  report   Report @relation(fields: [reportId], references: [id])
+}
