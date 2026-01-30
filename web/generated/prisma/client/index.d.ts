@@ -3460,10 +3460,12 @@ export namespace Prisma {
 
   export type SolutionAvgAggregateOutputType = {
     confidence: number | null
+    similarityScore: number | null
   }
 
   export type SolutionSumAggregateOutputType = {
     confidence: number | null
+    similarityScore: number | null
   }
 
   export type SolutionMinAggregateOutputType = {
@@ -3474,6 +3476,9 @@ export namespace Prisma {
     source: string | null
     confidence: number | null
     isGoldenRun: boolean | null
+    retrievalMethod: string | null
+    embeddingModel: string | null
+    similarityScore: number | null
     reportId: string | null
   }
 
@@ -3485,6 +3490,9 @@ export namespace Prisma {
     source: string | null
     confidence: number | null
     isGoldenRun: boolean | null
+    retrievalMethod: string | null
+    embeddingModel: string | null
+    similarityScore: number | null
     reportId: string | null
   }
 
@@ -3496,6 +3504,10 @@ export namespace Prisma {
     source: number
     confidence: number
     isGoldenRun: number
+    retrievalMethod: number
+    embeddingModel: number
+    similarityScore: number
+    retrievedSources: number
     reportId: number
     _all: number
   }
@@ -3503,10 +3515,12 @@ export namespace Prisma {
 
   export type SolutionAvgAggregateInputType = {
     confidence?: true
+    similarityScore?: true
   }
 
   export type SolutionSumAggregateInputType = {
     confidence?: true
+    similarityScore?: true
   }
 
   export type SolutionMinAggregateInputType = {
@@ -3517,6 +3531,9 @@ export namespace Prisma {
     source?: true
     confidence?: true
     isGoldenRun?: true
+    retrievalMethod?: true
+    embeddingModel?: true
+    similarityScore?: true
     reportId?: true
   }
 
@@ -3528,6 +3545,9 @@ export namespace Prisma {
     source?: true
     confidence?: true
     isGoldenRun?: true
+    retrievalMethod?: true
+    embeddingModel?: true
+    similarityScore?: true
     reportId?: true
   }
 
@@ -3539,6 +3559,10 @@ export namespace Prisma {
     source?: true
     confidence?: true
     isGoldenRun?: true
+    retrievalMethod?: true
+    embeddingModel?: true
+    similarityScore?: true
+    retrievedSources?: true
     reportId?: true
     _all?: true
   }
@@ -3637,6 +3661,10 @@ export namespace Prisma {
     source: string
     confidence: number | null
     isGoldenRun: boolean
+    retrievalMethod: string | null
+    embeddingModel: string | null
+    similarityScore: number | null
+    retrievedSources: JsonValue | null
     reportId: string
     _count: SolutionCountAggregateOutputType | null
     _avg: SolutionAvgAggregateOutputType | null
@@ -3667,6 +3695,10 @@ export namespace Prisma {
     source?: boolean
     confidence?: boolean
     isGoldenRun?: boolean
+    retrievalMethod?: boolean
+    embeddingModel?: boolean
+    similarityScore?: boolean
+    retrievedSources?: boolean
     reportId?: boolean
     report?: boolean | ReportDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["solution"]>
@@ -3679,6 +3711,10 @@ export namespace Prisma {
     source?: boolean
     confidence?: boolean
     isGoldenRun?: boolean
+    retrievalMethod?: boolean
+    embeddingModel?: boolean
+    similarityScore?: boolean
+    retrievedSources?: boolean
     reportId?: boolean
     report?: boolean | ReportDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["solution"]>
@@ -3691,6 +3727,10 @@ export namespace Prisma {
     source?: boolean
     confidence?: boolean
     isGoldenRun?: boolean
+    retrievalMethod?: boolean
+    embeddingModel?: boolean
+    similarityScore?: boolean
+    retrievedSources?: boolean
     reportId?: boolean
     report?: boolean | ReportDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["solution"]>
@@ -3703,10 +3743,14 @@ export namespace Prisma {
     source?: boolean
     confidence?: boolean
     isGoldenRun?: boolean
+    retrievalMethod?: boolean
+    embeddingModel?: boolean
+    similarityScore?: boolean
+    retrievedSources?: boolean
     reportId?: boolean
   }
 
-  export type SolutionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "title" | "steps" | "source" | "confidence" | "isGoldenRun" | "reportId", ExtArgs["result"]["solution"]>
+  export type SolutionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "title" | "steps" | "source" | "confidence" | "isGoldenRun" | "retrievalMethod" | "embeddingModel" | "similarityScore" | "retrievedSources" | "reportId", ExtArgs["result"]["solution"]>
   export type SolutionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     report?: boolean | ReportDefaultArgs<ExtArgs>
   }
@@ -3730,6 +3774,10 @@ export namespace Prisma {
       source: string
       confidence: number | null
       isGoldenRun: boolean
+      retrievalMethod: string | null
+      embeddingModel: string | null
+      similarityScore: number | null
+      retrievedSources: Prisma.JsonValue | null
       reportId: string
     }, ExtArgs["result"]["solution"]>
     composites: {}
@@ -4162,6 +4210,10 @@ export namespace Prisma {
     readonly source: FieldRef<"Solution", 'String'>
     readonly confidence: FieldRef<"Solution", 'Float'>
     readonly isGoldenRun: FieldRef<"Solution", 'Boolean'>
+    readonly retrievalMethod: FieldRef<"Solution", 'String'>
+    readonly embeddingModel: FieldRef<"Solution", 'String'>
+    readonly similarityScore: FieldRef<"Solution", 'Float'>
+    readonly retrievedSources: FieldRef<"Solution", 'Json'>
     readonly reportId: FieldRef<"Solution", 'String'>
   }
     
@@ -4630,6 +4682,10 @@ export namespace Prisma {
     source: 'source',
     confidence: 'confidence',
     isGoldenRun: 'isGoldenRun',
+    retrievalMethod: 'retrievalMethod',
+    embeddingModel: 'embeddingModel',
+    similarityScore: 'similarityScore',
+    retrievedSources: 'retrievedSources',
     reportId: 'reportId'
   };
 
@@ -4642,6 +4698,14 @@ export namespace Prisma {
   };
 
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+  export const NullableJsonNullValueInput: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull
+  };
+
+  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
   export const QueryMode: {
@@ -4658,6 +4722,15 @@ export namespace Prisma {
   };
 
   export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
   /**
@@ -4753,6 +4826,20 @@ export namespace Prisma {
    * Reference to a field of type 'Boolean'
    */
   export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -4948,6 +5035,10 @@ export namespace Prisma {
     source?: StringFilter<"Solution"> | string
     confidence?: FloatNullableFilter<"Solution"> | number | null
     isGoldenRun?: BoolFilter<"Solution"> | boolean
+    retrievalMethod?: StringNullableFilter<"Solution"> | string | null
+    embeddingModel?: StringNullableFilter<"Solution"> | string | null
+    similarityScore?: FloatNullableFilter<"Solution"> | number | null
+    retrievedSources?: JsonNullableFilter<"Solution">
     reportId?: UuidFilter<"Solution"> | string
     report?: XOR<ReportScalarRelationFilter, ReportWhereInput>
   }
@@ -4960,6 +5051,10 @@ export namespace Prisma {
     source?: SortOrder
     confidence?: SortOrderInput | SortOrder
     isGoldenRun?: SortOrder
+    retrievalMethod?: SortOrderInput | SortOrder
+    embeddingModel?: SortOrderInput | SortOrder
+    similarityScore?: SortOrderInput | SortOrder
+    retrievedSources?: SortOrderInput | SortOrder
     reportId?: SortOrder
     report?: ReportOrderByWithRelationInput
   }
@@ -4976,6 +5071,10 @@ export namespace Prisma {
     source?: StringFilter<"Solution"> | string
     confidence?: FloatNullableFilter<"Solution"> | number | null
     isGoldenRun?: BoolFilter<"Solution"> | boolean
+    retrievalMethod?: StringNullableFilter<"Solution"> | string | null
+    embeddingModel?: StringNullableFilter<"Solution"> | string | null
+    similarityScore?: FloatNullableFilter<"Solution"> | number | null
+    retrievedSources?: JsonNullableFilter<"Solution">
     report?: XOR<ReportScalarRelationFilter, ReportWhereInput>
   }, "id" | "reportId">
 
@@ -4987,6 +5086,10 @@ export namespace Prisma {
     source?: SortOrder
     confidence?: SortOrderInput | SortOrder
     isGoldenRun?: SortOrder
+    retrievalMethod?: SortOrderInput | SortOrder
+    embeddingModel?: SortOrderInput | SortOrder
+    similarityScore?: SortOrderInput | SortOrder
+    retrievedSources?: SortOrderInput | SortOrder
     reportId?: SortOrder
     _count?: SolutionCountOrderByAggregateInput
     _avg?: SolutionAvgOrderByAggregateInput
@@ -5006,6 +5109,10 @@ export namespace Prisma {
     source?: StringWithAggregatesFilter<"Solution"> | string
     confidence?: FloatNullableWithAggregatesFilter<"Solution"> | number | null
     isGoldenRun?: BoolWithAggregatesFilter<"Solution"> | boolean
+    retrievalMethod?: StringNullableWithAggregatesFilter<"Solution"> | string | null
+    embeddingModel?: StringNullableWithAggregatesFilter<"Solution"> | string | null
+    similarityScore?: FloatNullableWithAggregatesFilter<"Solution"> | number | null
+    retrievedSources?: JsonNullableWithAggregatesFilter<"Solution">
     reportId?: UuidWithAggregatesFilter<"Solution"> | string
   }
 
@@ -5202,6 +5309,10 @@ export namespace Prisma {
     source: string
     confidence?: number | null
     isGoldenRun?: boolean
+    retrievalMethod?: string | null
+    embeddingModel?: string | null
+    similarityScore?: number | null
+    retrievedSources?: NullableJsonNullValueInput | InputJsonValue
     report: ReportCreateNestedOneWithoutSolutionInput
   }
 
@@ -5213,6 +5324,10 @@ export namespace Prisma {
     source: string
     confidence?: number | null
     isGoldenRun?: boolean
+    retrievalMethod?: string | null
+    embeddingModel?: string | null
+    similarityScore?: number | null
+    retrievedSources?: NullableJsonNullValueInput | InputJsonValue
     reportId: string
   }
 
@@ -5224,6 +5339,10 @@ export namespace Prisma {
     source?: StringFieldUpdateOperationsInput | string
     confidence?: NullableFloatFieldUpdateOperationsInput | number | null
     isGoldenRun?: BoolFieldUpdateOperationsInput | boolean
+    retrievalMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    embeddingModel?: NullableStringFieldUpdateOperationsInput | string | null
+    similarityScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    retrievedSources?: NullableJsonNullValueInput | InputJsonValue
     report?: ReportUpdateOneRequiredWithoutSolutionNestedInput
   }
 
@@ -5235,6 +5354,10 @@ export namespace Prisma {
     source?: StringFieldUpdateOperationsInput | string
     confidence?: NullableFloatFieldUpdateOperationsInput | number | null
     isGoldenRun?: BoolFieldUpdateOperationsInput | boolean
+    retrievalMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    embeddingModel?: NullableStringFieldUpdateOperationsInput | string | null
+    similarityScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    retrievedSources?: NullableJsonNullValueInput | InputJsonValue
     reportId?: StringFieldUpdateOperationsInput | string
   }
 
@@ -5246,6 +5369,10 @@ export namespace Prisma {
     source: string
     confidence?: number | null
     isGoldenRun?: boolean
+    retrievalMethod?: string | null
+    embeddingModel?: string | null
+    similarityScore?: number | null
+    retrievedSources?: NullableJsonNullValueInput | InputJsonValue
     reportId: string
   }
 
@@ -5257,6 +5384,10 @@ export namespace Prisma {
     source?: StringFieldUpdateOperationsInput | string
     confidence?: NullableFloatFieldUpdateOperationsInput | number | null
     isGoldenRun?: BoolFieldUpdateOperationsInput | boolean
+    retrievalMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    embeddingModel?: NullableStringFieldUpdateOperationsInput | string | null
+    similarityScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    retrievedSources?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type SolutionUncheckedUpdateManyInput = {
@@ -5267,6 +5398,10 @@ export namespace Prisma {
     source?: StringFieldUpdateOperationsInput | string
     confidence?: NullableFloatFieldUpdateOperationsInput | number | null
     isGoldenRun?: BoolFieldUpdateOperationsInput | boolean
+    retrievalMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    embeddingModel?: NullableStringFieldUpdateOperationsInput | string | null
+    similarityScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    retrievedSources?: NullableJsonNullValueInput | InputJsonValue
     reportId?: StringFieldUpdateOperationsInput | string
   }
 
@@ -5592,6 +5727,29 @@ export namespace Prisma {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
   }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type ReportScalarRelationFilter = {
     is?: ReportWhereInput
@@ -5606,11 +5764,16 @@ export namespace Prisma {
     source?: SortOrder
     confidence?: SortOrder
     isGoldenRun?: SortOrder
+    retrievalMethod?: SortOrder
+    embeddingModel?: SortOrder
+    similarityScore?: SortOrder
+    retrievedSources?: SortOrder
     reportId?: SortOrder
   }
 
   export type SolutionAvgOrderByAggregateInput = {
     confidence?: SortOrder
+    similarityScore?: SortOrder
   }
 
   export type SolutionMaxOrderByAggregateInput = {
@@ -5621,6 +5784,9 @@ export namespace Prisma {
     source?: SortOrder
     confidence?: SortOrder
     isGoldenRun?: SortOrder
+    retrievalMethod?: SortOrder
+    embeddingModel?: SortOrder
+    similarityScore?: SortOrder
     reportId?: SortOrder
   }
 
@@ -5632,11 +5798,15 @@ export namespace Prisma {
     source?: SortOrder
     confidence?: SortOrder
     isGoldenRun?: SortOrder
+    retrievalMethod?: SortOrder
+    embeddingModel?: SortOrder
+    similarityScore?: SortOrder
     reportId?: SortOrder
   }
 
   export type SolutionSumOrderByAggregateInput = {
     confidence?: SortOrder
+    similarityScore?: SortOrder
   }
 
   export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -5661,6 +5831,32 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type ReportCreateNestedManyWithoutConductorInput = {
@@ -6117,6 +6313,29 @@ export namespace Prisma {
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
   }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type ReportCreateWithoutConductorInput = {
     id?: string
@@ -6251,6 +6470,10 @@ export namespace Prisma {
     source: string
     confidence?: number | null
     isGoldenRun?: boolean
+    retrievalMethod?: string | null
+    embeddingModel?: string | null
+    similarityScore?: number | null
+    retrievedSources?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type SolutionUncheckedCreateWithoutReportInput = {
@@ -6261,6 +6484,10 @@ export namespace Prisma {
     source: string
     confidence?: number | null
     isGoldenRun?: boolean
+    retrievalMethod?: string | null
+    embeddingModel?: string | null
+    similarityScore?: number | null
+    retrievedSources?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type SolutionCreateOrConnectWithoutReportInput = {
@@ -6345,6 +6572,10 @@ export namespace Prisma {
     source?: StringFieldUpdateOperationsInput | string
     confidence?: NullableFloatFieldUpdateOperationsInput | number | null
     isGoldenRun?: BoolFieldUpdateOperationsInput | boolean
+    retrievalMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    embeddingModel?: NullableStringFieldUpdateOperationsInput | string | null
+    similarityScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    retrievedSources?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type SolutionUncheckedUpdateWithoutReportInput = {
@@ -6355,6 +6586,10 @@ export namespace Prisma {
     source?: StringFieldUpdateOperationsInput | string
     confidence?: NullableFloatFieldUpdateOperationsInput | number | null
     isGoldenRun?: BoolFieldUpdateOperationsInput | boolean
+    retrievalMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    embeddingModel?: NullableStringFieldUpdateOperationsInput | string | null
+    similarityScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    retrievedSources?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type UserUpsertWithoutReportsInput = {

@@ -10,6 +10,7 @@
     "create-user": "tsx scripts/create-user.ts"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
     "@supabase/ssr": "^0.8.0",
@@ -22,7 +23,8 @@
     "pg": "^8.17.2",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "zustand": "^5.0.10"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

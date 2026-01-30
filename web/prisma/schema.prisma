@@ -76,7 +76,13 @@ model Solution {
   
   source      String
   confidence  Float?
-  isGoldenRun Boolean  @default(false) 
+  isGoldenRun Boolean  @default(false)
+  
+  // Multimodal RAG metadata
+  retrievalMethod   String?  // "multimodal" | "text-only" | "fallback"
+  embeddingModel    String?  // "gemini-embedding-004" | "text-embedding-004"
+  similarityScore   Float?   // Top match score from vector search
+  retrievedSources  Json?    // Array of similar incident IDs with scores
 
   // relations
   reportId    String   @unique @db.Uuid

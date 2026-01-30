@@ -153,12 +153,21 @@ exports.Prisma.SolutionScalarFieldEnum = {
   source: 'source',
   confidence: 'confidence',
   isGoldenRun: 'isGoldenRun',
+  retrievalMethod: 'retrievalMethod',
+  embeddingModel: 'embeddingModel',
+  similarityScore: 'similarityScore',
+  retrievedSources: 'retrievedSources',
   reportId: 'reportId'
 };
 
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -169,6 +178,12 @@ exports.Prisma.QueryMode = {
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
+};
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
 };
 exports.UserRole = exports.$Enums.UserRole = {
   ADMIN: 'ADMIN',
