@@ -62,6 +62,10 @@ neorail/
 │   ├── lib/                  # Utilities (Auth, Database, Helpers)
 │   ├── prisma/               # Database Schema & Migrations
 │   └── public/               # Static assets
+├── Qdrant/                      # Local vector ingestion & retrieval
+│   ├── Ingest.py                # CSV ingestion -> Qdrant (embeddings)
+│   ├── Main.py                  # FastAPI retrieval service (startup init)
+│   └── RailIncidentData.csv     # Incident dataset (example)
 ├── TrainsSim/                   # Train Simulation Service
 │   └── TrainsSim.py             # FastAPI backend for real-time train tracking
 ```
@@ -144,6 +148,53 @@ uvicorn TrainsSim:app --reload
 
 The API will be available at [http://localhost:8000](http://localhost:8000)
 
+
+---
+
+## Qdrant (Local) Setup
+
+Follow these steps to populate and run the local Qdrant-backed retrieval service used by NeoRail.
+- Install Python dependencies (use your venv if preferred):
+
+```bash
+pip install qdrant-client sentence-transformers pandas
+```
+
+- Download the dataset into the repository (example using curl):
+
+```bash
+curl -L -o Qdrant/RailIncidentData.csv https://raw.githubusercontent.com/colbystout/Rail-Incident-Data-Set/blob/main/RailIncidentData.csv
+```
+
+- Run the ingestion script to create a local Qdrant database and load embeddings:
+
+```bash
+python Qdrant/Ingest.py --csv Qdrant/RailIncidentData.csv --limit 500
+```
+
+- Start the FastAPI service that exposes the retrieval endpoint (run from repo root or `Qdrant/`):
+
+```bash
+# from repo root
+uvicorn Qdrant.main:app --reload
+
+# or if running inside the Qdrant/ folder and the file is named `main.py`:
+uvicorn main:app --reload
+```
+
+- Verify the service:
+
+```bash
+# Health check
+curl http://127.0.0.1:8000/health
+
+# Test retrieval (replace query text as needed)
+curl "http://127.0.0.1:8000/find-solution?description=Tree%20on%20track%20in%20snow"
+```
+
+Notes:
+- The provided `Ingest.py` uses a local Qdrant client path (creates `qdrant_db` folder) — a separate Qdrant server is not required for this local workflow.
+- Ensure `qdrant-client`, `sentence-transformers`, and `pandas` are installed in the same Python environment used to run the scripts.
 
 ---
 
