@@ -44,3 +44,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+#Qdrant setup
+Qdrant/__pycache__/*
+Qdrant/qdrant_db/*
+Qdrant/RailIncidentData.csv
+
+#Trainsim
+TrainsSim/__pycache__/*
