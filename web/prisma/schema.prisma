@@ -15,7 +15,9 @@ enum UserRole {
 enum Status {
   OPEN
   ANALYZING
-  RESOLVED
+  PENDING_REVIEW    // Admin reviewing solution candidates
+  PENDING_CONDUCTOR // Solution sent, waiting for conductor acknowledgment
+  RESOLVED          // Conductor acknowledged and took action
 }
 
 enum Urgency {
@@ -58,6 +60,7 @@ model Report {
 
   // output
   solution    Solution?
+  candidates  SolutionCandidate[]  // Solution candidates for admin review
 
   // relations
   conductorId String   @db.Uuid
@@ -80,12 +83,40 @@ model Solution {
   
   // Multimodal RAG metadata
   retrievalMethod   String?  // "multimodal" | "text-only" | "fallback"
-  embeddingModel    String?  // "gemini-embedding-004" | "text-embedding-004"
+  embeddingModel    String?  // "openclip-ViT-L-14" | "gemini-embedding-004"
   similarityScore   Float?   // Top match score from vector search
   retrievedSources  Json?    // Array of similar incident IDs with scores
 
+  // Solution workflow tracking
+  confirmedAt       DateTime?  // When admin confirmed the solution
+  acknowledgedAt    DateTime?  // When conductor acknowledged receipt
+  
   // relations
   reportId    String   @unique @db.Uuid
   report      Report   @relation(fields: [reportId], references: [id]) 
+}
+
+// Temporary storage for solution candidates before admin selection
+model SolutionCandidate {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt   DateTime @default(now())
+  
+  title       String
+  steps       String
+  action      String      // Original action from Qdrant
+  detail      String      // Original detail from Qdrant
+  
+  score       Float       // Similarity score (confidence)
+  rank        Int         // 1, 2, or 3 (1 = best match)
+  
+  sourceId    Int         // Original incident ID from Qdrant
+  avgDelay    Int?        // Average delay from similar incidents
+  timesUsed   Int?        // How many times this solution was used
+  
+  // relations
+  reportId    String      @db.Uuid
+  report      Report      @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  
+  @@index([reportId])
 }
 

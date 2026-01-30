@@ -18,7 +18,7 @@ export type ReportPayload = {
   location: string;
   trainId: string | null;
   urgency: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
-  status: "OPEN" | "ANALYZING" | "RESOLVED";
+  status: "OPEN" | "ANALYZING" | "PENDING_REVIEW" | "PENDING_CONDUCTOR" | "RESOLVED";
   conductorId: string;
   adminId: string | null;
 };
@@ -35,6 +35,8 @@ export type SolutionPayload = {
   retrievalMethod: string | null;
   retrievedSources: unknown;
   reportId: string;
+  confirmedAt: string | null;
+  acknowledgedAt: string | null;
 };
 
 export type ReportRealtimeEvent = {

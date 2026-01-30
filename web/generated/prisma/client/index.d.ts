@@ -28,6 +28,11 @@ export type Report = $Result.DefaultSelection<Prisma.$ReportPayload>
  * 
  */
 export type Solution = $Result.DefaultSelection<Prisma.$SolutionPayload>
+/**
+ * Model SolutionCandidate
+ * 
+ */
+export type SolutionCandidate = $Result.DefaultSelection<Prisma.$SolutionCandidatePayload>
 
 /**
  * Enums
@@ -44,6 +49,8 @@ export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 export const Status: {
   OPEN: 'OPEN',
   ANALYZING: 'ANALYZING',
+  PENDING_REVIEW: 'PENDING_REVIEW',
+  PENDING_CONDUCTOR: 'PENDING_CONDUCTOR',
   RESOLVED: 'RESOLVED'
 };
 
@@ -219,6 +226,16 @@ export class PrismaClient<
     * ```
     */
   get solution(): Prisma.SolutionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.solutionCandidate`: Exposes CRUD operations for the **SolutionCandidate** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SolutionCandidates
+    * const solutionCandidates = await prisma.solutionCandidate.findMany()
+    * ```
+    */
+  get solutionCandidate(): Prisma.SolutionCandidateDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -655,7 +672,8 @@ export namespace Prisma {
   export const ModelName: {
     User: 'User',
     Report: 'Report',
-    Solution: 'Solution'
+    Solution: 'Solution',
+    SolutionCandidate: 'SolutionCandidate'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -671,7 +689,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "report" | "solution"
+      modelProps: "user" | "report" | "solution" | "solutionCandidate"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -897,6 +915,80 @@ export namespace Prisma {
           }
         }
       }
+      SolutionCandidate: {
+        payload: Prisma.$SolutionCandidatePayload<ExtArgs>
+        fields: Prisma.SolutionCandidateFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SolutionCandidateFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SolutionCandidatePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SolutionCandidateFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SolutionCandidatePayload>
+          }
+          findFirst: {
+            args: Prisma.SolutionCandidateFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SolutionCandidatePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SolutionCandidateFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SolutionCandidatePayload>
+          }
+          findMany: {
+            args: Prisma.SolutionCandidateFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SolutionCandidatePayload>[]
+          }
+          create: {
+            args: Prisma.SolutionCandidateCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SolutionCandidatePayload>
+          }
+          createMany: {
+            args: Prisma.SolutionCandidateCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SolutionCandidateCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SolutionCandidatePayload>[]
+          }
+          delete: {
+            args: Prisma.SolutionCandidateDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SolutionCandidatePayload>
+          }
+          update: {
+            args: Prisma.SolutionCandidateUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SolutionCandidatePayload>
+          }
+          deleteMany: {
+            args: Prisma.SolutionCandidateDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SolutionCandidateUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SolutionCandidateUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SolutionCandidatePayload>[]
+          }
+          upsert: {
+            args: Prisma.SolutionCandidateUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SolutionCandidatePayload>
+          }
+          aggregate: {
+            args: Prisma.SolutionCandidateAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSolutionCandidate>
+          }
+          groupBy: {
+            args: Prisma.SolutionCandidateGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SolutionCandidateGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SolutionCandidateCountArgs<ExtArgs>
+            result: $Utils.Optional<SolutionCandidateCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1008,6 +1100,7 @@ export namespace Prisma {
     user?: UserOmit
     report?: ReportOmit
     solution?: SolutionOmit
+    solutionCandidate?: SolutionCandidateOmit
   }
 
   /* Types for Logging */
@@ -1120,6 +1213,37 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountResolvedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ReportWhereInput
+  }
+
+
+  /**
+   * Count Type ReportCountOutputType
+   */
+
+  export type ReportCountOutputType = {
+    candidates: number
+  }
+
+  export type ReportCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    candidates?: boolean | ReportCountOutputTypeCountCandidatesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ReportCountOutputType without action
+   */
+  export type ReportCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportCountOutputType
+     */
+    select?: ReportCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ReportCountOutputType without action
+   */
+  export type ReportCountOutputTypeCountCandidatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SolutionCandidateWhereInput
   }
 
 
@@ -2473,8 +2597,10 @@ export namespace Prisma {
     conductorId?: boolean
     adminId?: boolean
     solution?: boolean | Report$solutionArgs<ExtArgs>
+    candidates?: boolean | Report$candidatesArgs<ExtArgs>
     conductor?: boolean | UserDefaultArgs<ExtArgs>
     admin?: boolean | Report$adminArgs<ExtArgs>
+    _count?: boolean | ReportCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["report"]>
 
   export type ReportSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -2526,8 +2652,10 @@ export namespace Prisma {
   export type ReportOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "content" | "imageUrl" | "location" | "trainId" | "urgency" | "status" | "conductorId" | "adminId", ExtArgs["result"]["report"]>
   export type ReportInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     solution?: boolean | Report$solutionArgs<ExtArgs>
+    candidates?: boolean | Report$candidatesArgs<ExtArgs>
     conductor?: boolean | UserDefaultArgs<ExtArgs>
     admin?: boolean | Report$adminArgs<ExtArgs>
+    _count?: boolean | ReportCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ReportIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     conductor?: boolean | UserDefaultArgs<ExtArgs>
@@ -2542,6 +2670,7 @@ export namespace Prisma {
     name: "Report"
     objects: {
       solution: Prisma.$SolutionPayload<ExtArgs> | null
+      candidates: Prisma.$SolutionCandidatePayload<ExtArgs>[]
       conductor: Prisma.$UserPayload<ExtArgs>
       admin: Prisma.$UserPayload<ExtArgs> | null
     }
@@ -2952,6 +3081,7 @@ export namespace Prisma {
   export interface Prisma__ReportClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     solution<T extends Report$solutionArgs<ExtArgs> = {}>(args?: Subset<T, Report$solutionArgs<ExtArgs>>): Prisma__SolutionClient<$Result.GetResult<Prisma.$SolutionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    candidates<T extends Report$candidatesArgs<ExtArgs> = {}>(args?: Subset<T, Report$candidatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SolutionCandidatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     conductor<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     admin<T extends Report$adminArgs<ExtArgs> = {}>(args?: Subset<T, Report$adminArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
@@ -3409,6 +3539,30 @@ export namespace Prisma {
   }
 
   /**
+   * Report.candidates
+   */
+  export type Report$candidatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolutionCandidate
+     */
+    select?: SolutionCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolutionCandidate
+     */
+    omit?: SolutionCandidateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolutionCandidateInclude<ExtArgs> | null
+    where?: SolutionCandidateWhereInput
+    orderBy?: SolutionCandidateOrderByWithRelationInput | SolutionCandidateOrderByWithRelationInput[]
+    cursor?: SolutionCandidateWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SolutionCandidateScalarFieldEnum | SolutionCandidateScalarFieldEnum[]
+  }
+
+  /**
    * Report.admin
    */
   export type Report$adminArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3479,6 +3633,8 @@ export namespace Prisma {
     retrievalMethod: string | null
     embeddingModel: string | null
     similarityScore: number | null
+    confirmedAt: Date | null
+    acknowledgedAt: Date | null
     reportId: string | null
   }
 
@@ -3493,6 +3649,8 @@ export namespace Prisma {
     retrievalMethod: string | null
     embeddingModel: string | null
     similarityScore: number | null
+    confirmedAt: Date | null
+    acknowledgedAt: Date | null
     reportId: string | null
   }
 
@@ -3508,6 +3666,8 @@ export namespace Prisma {
     embeddingModel: number
     similarityScore: number
     retrievedSources: number
+    confirmedAt: number
+    acknowledgedAt: number
     reportId: number
     _all: number
   }
@@ -3534,6 +3694,8 @@ export namespace Prisma {
     retrievalMethod?: true
     embeddingModel?: true
     similarityScore?: true
+    confirmedAt?: true
+    acknowledgedAt?: true
     reportId?: true
   }
 
@@ -3548,6 +3710,8 @@ export namespace Prisma {
     retrievalMethod?: true
     embeddingModel?: true
     similarityScore?: true
+    confirmedAt?: true
+    acknowledgedAt?: true
     reportId?: true
   }
 
@@ -3563,6 +3727,8 @@ export namespace Prisma {
     embeddingModel?: true
     similarityScore?: true
     retrievedSources?: true
+    confirmedAt?: true
+    acknowledgedAt?: true
     reportId?: true
     _all?: true
   }
@@ -3665,6 +3831,8 @@ export namespace Prisma {
     embeddingModel: string | null
     similarityScore: number | null
     retrievedSources: JsonValue | null
+    confirmedAt: Date | null
+    acknowledgedAt: Date | null
     reportId: string
     _count: SolutionCountAggregateOutputType | null
     _avg: SolutionAvgAggregateOutputType | null
@@ -3699,6 +3867,8 @@ export namespace Prisma {
     embeddingModel?: boolean
     similarityScore?: boolean
     retrievedSources?: boolean
+    confirmedAt?: boolean
+    acknowledgedAt?: boolean
     reportId?: boolean
     report?: boolean | ReportDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["solution"]>
@@ -3715,6 +3885,8 @@ export namespace Prisma {
     embeddingModel?: boolean
     similarityScore?: boolean
     retrievedSources?: boolean
+    confirmedAt?: boolean
+    acknowledgedAt?: boolean
     reportId?: boolean
     report?: boolean | ReportDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["solution"]>
@@ -3731,6 +3903,8 @@ export namespace Prisma {
     embeddingModel?: boolean
     similarityScore?: boolean
     retrievedSources?: boolean
+    confirmedAt?: boolean
+    acknowledgedAt?: boolean
     reportId?: boolean
     report?: boolean | ReportDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["solution"]>
@@ -3747,10 +3921,12 @@ export namespace Prisma {
     embeddingModel?: boolean
     similarityScore?: boolean
     retrievedSources?: boolean
+    confirmedAt?: boolean
+    acknowledgedAt?: boolean
     reportId?: boolean
   }
 
-  export type SolutionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "title" | "steps" | "source" | "confidence" | "isGoldenRun" | "retrievalMethod" | "embeddingModel" | "similarityScore" | "retrievedSources" | "reportId", ExtArgs["result"]["solution"]>
+  export type SolutionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "title" | "steps" | "source" | "confidence" | "isGoldenRun" | "retrievalMethod" | "embeddingModel" | "similarityScore" | "retrievedSources" | "confirmedAt" | "acknowledgedAt" | "reportId", ExtArgs["result"]["solution"]>
   export type SolutionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     report?: boolean | ReportDefaultArgs<ExtArgs>
   }
@@ -3778,6 +3954,8 @@ export namespace Prisma {
       embeddingModel: string | null
       similarityScore: number | null
       retrievedSources: Prisma.JsonValue | null
+      confirmedAt: Date | null
+      acknowledgedAt: Date | null
       reportId: string
     }, ExtArgs["result"]["solution"]>
     composites: {}
@@ -4214,6 +4392,8 @@ export namespace Prisma {
     readonly embeddingModel: FieldRef<"Solution", 'String'>
     readonly similarityScore: FieldRef<"Solution", 'Float'>
     readonly retrievedSources: FieldRef<"Solution", 'Json'>
+    readonly confirmedAt: FieldRef<"Solution", 'DateTime'>
+    readonly acknowledgedAt: FieldRef<"Solution", 'DateTime'>
     readonly reportId: FieldRef<"Solution", 'String'>
   }
     
@@ -4630,6 +4810,1205 @@ export namespace Prisma {
 
 
   /**
+   * Model SolutionCandidate
+   */
+
+  export type AggregateSolutionCandidate = {
+    _count: SolutionCandidateCountAggregateOutputType | null
+    _avg: SolutionCandidateAvgAggregateOutputType | null
+    _sum: SolutionCandidateSumAggregateOutputType | null
+    _min: SolutionCandidateMinAggregateOutputType | null
+    _max: SolutionCandidateMaxAggregateOutputType | null
+  }
+
+  export type SolutionCandidateAvgAggregateOutputType = {
+    score: number | null
+    rank: number | null
+    sourceId: number | null
+    avgDelay: number | null
+    timesUsed: number | null
+  }
+
+  export type SolutionCandidateSumAggregateOutputType = {
+    score: number | null
+    rank: number | null
+    sourceId: number | null
+    avgDelay: number | null
+    timesUsed: number | null
+  }
+
+  export type SolutionCandidateMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    title: string | null
+    steps: string | null
+    action: string | null
+    detail: string | null
+    score: number | null
+    rank: number | null
+    sourceId: number | null
+    avgDelay: number | null
+    timesUsed: number | null
+    reportId: string | null
+  }
+
+  export type SolutionCandidateMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    title: string | null
+    steps: string | null
+    action: string | null
+    detail: string | null
+    score: number | null
+    rank: number | null
+    sourceId: number | null
+    avgDelay: number | null
+    timesUsed: number | null
+    reportId: string | null
+  }
+
+  export type SolutionCandidateCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    title: number
+    steps: number
+    action: number
+    detail: number
+    score: number
+    rank: number
+    sourceId: number
+    avgDelay: number
+    timesUsed: number
+    reportId: number
+    _all: number
+  }
+
+
+  export type SolutionCandidateAvgAggregateInputType = {
+    score?: true
+    rank?: true
+    sourceId?: true
+    avgDelay?: true
+    timesUsed?: true
+  }
+
+  export type SolutionCandidateSumAggregateInputType = {
+    score?: true
+    rank?: true
+    sourceId?: true
+    avgDelay?: true
+    timesUsed?: true
+  }
+
+  export type SolutionCandidateMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    title?: true
+    steps?: true
+    action?: true
+    detail?: true
+    score?: true
+    rank?: true
+    sourceId?: true
+    avgDelay?: true
+    timesUsed?: true
+    reportId?: true
+  }
+
+  export type SolutionCandidateMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    title?: true
+    steps?: true
+    action?: true
+    detail?: true
+    score?: true
+    rank?: true
+    sourceId?: true
+    avgDelay?: true
+    timesUsed?: true
+    reportId?: true
+  }
+
+  export type SolutionCandidateCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    title?: true
+    steps?: true
+    action?: true
+    detail?: true
+    score?: true
+    rank?: true
+    sourceId?: true
+    avgDelay?: true
+    timesUsed?: true
+    reportId?: true
+    _all?: true
+  }
+
+  export type SolutionCandidateAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SolutionCandidate to aggregate.
+     */
+    where?: SolutionCandidateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SolutionCandidates to fetch.
+     */
+    orderBy?: SolutionCandidateOrderByWithRelationInput | SolutionCandidateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SolutionCandidateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SolutionCandidates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SolutionCandidates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SolutionCandidates
+    **/
+    _count?: true | SolutionCandidateCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SolutionCandidateAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SolutionCandidateSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SolutionCandidateMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SolutionCandidateMaxAggregateInputType
+  }
+
+  export type GetSolutionCandidateAggregateType<T extends SolutionCandidateAggregateArgs> = {
+        [P in keyof T & keyof AggregateSolutionCandidate]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSolutionCandidate[P]>
+      : GetScalarType<T[P], AggregateSolutionCandidate[P]>
+  }
+
+
+
+
+  export type SolutionCandidateGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SolutionCandidateWhereInput
+    orderBy?: SolutionCandidateOrderByWithAggregationInput | SolutionCandidateOrderByWithAggregationInput[]
+    by: SolutionCandidateScalarFieldEnum[] | SolutionCandidateScalarFieldEnum
+    having?: SolutionCandidateScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SolutionCandidateCountAggregateInputType | true
+    _avg?: SolutionCandidateAvgAggregateInputType
+    _sum?: SolutionCandidateSumAggregateInputType
+    _min?: SolutionCandidateMinAggregateInputType
+    _max?: SolutionCandidateMaxAggregateInputType
+  }
+
+  export type SolutionCandidateGroupByOutputType = {
+    id: string
+    createdAt: Date
+    title: string
+    steps: string
+    action: string
+    detail: string
+    score: number
+    rank: number
+    sourceId: number
+    avgDelay: number | null
+    timesUsed: number | null
+    reportId: string
+    _count: SolutionCandidateCountAggregateOutputType | null
+    _avg: SolutionCandidateAvgAggregateOutputType | null
+    _sum: SolutionCandidateSumAggregateOutputType | null
+    _min: SolutionCandidateMinAggregateOutputType | null
+    _max: SolutionCandidateMaxAggregateOutputType | null
+  }
+
+  type GetSolutionCandidateGroupByPayload<T extends SolutionCandidateGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SolutionCandidateGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SolutionCandidateGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SolutionCandidateGroupByOutputType[P]>
+            : GetScalarType<T[P], SolutionCandidateGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SolutionCandidateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    title?: boolean
+    steps?: boolean
+    action?: boolean
+    detail?: boolean
+    score?: boolean
+    rank?: boolean
+    sourceId?: boolean
+    avgDelay?: boolean
+    timesUsed?: boolean
+    reportId?: boolean
+    report?: boolean | ReportDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["solutionCandidate"]>
+
+  export type SolutionCandidateSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    title?: boolean
+    steps?: boolean
+    action?: boolean
+    detail?: boolean
+    score?: boolean
+    rank?: boolean
+    sourceId?: boolean
+    avgDelay?: boolean
+    timesUsed?: boolean
+    reportId?: boolean
+    report?: boolean | ReportDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["solutionCandidate"]>
+
+  export type SolutionCandidateSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    title?: boolean
+    steps?: boolean
+    action?: boolean
+    detail?: boolean
+    score?: boolean
+    rank?: boolean
+    sourceId?: boolean
+    avgDelay?: boolean
+    timesUsed?: boolean
+    reportId?: boolean
+    report?: boolean | ReportDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["solutionCandidate"]>
+
+  export type SolutionCandidateSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    title?: boolean
+    steps?: boolean
+    action?: boolean
+    detail?: boolean
+    score?: boolean
+    rank?: boolean
+    sourceId?: boolean
+    avgDelay?: boolean
+    timesUsed?: boolean
+    reportId?: boolean
+  }
+
+  export type SolutionCandidateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "title" | "steps" | "action" | "detail" | "score" | "rank" | "sourceId" | "avgDelay" | "timesUsed" | "reportId", ExtArgs["result"]["solutionCandidate"]>
+  export type SolutionCandidateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    report?: boolean | ReportDefaultArgs<ExtArgs>
+  }
+  export type SolutionCandidateIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    report?: boolean | ReportDefaultArgs<ExtArgs>
+  }
+  export type SolutionCandidateIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    report?: boolean | ReportDefaultArgs<ExtArgs>
+  }
+
+  export type $SolutionCandidatePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SolutionCandidate"
+    objects: {
+      report: Prisma.$ReportPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      title: string
+      steps: string
+      action: string
+      detail: string
+      score: number
+      rank: number
+      sourceId: number
+      avgDelay: number | null
+      timesUsed: number | null
+      reportId: string
+    }, ExtArgs["result"]["solutionCandidate"]>
+    composites: {}
+  }
+
+  type SolutionCandidateGetPayload<S extends boolean | null | undefined | SolutionCandidateDefaultArgs> = $Result.GetResult<Prisma.$SolutionCandidatePayload, S>
+
+  type SolutionCandidateCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SolutionCandidateFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SolutionCandidateCountAggregateInputType | true
+    }
+
+  export interface SolutionCandidateDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SolutionCandidate'], meta: { name: 'SolutionCandidate' } }
+    /**
+     * Find zero or one SolutionCandidate that matches the filter.
+     * @param {SolutionCandidateFindUniqueArgs} args - Arguments to find a SolutionCandidate
+     * @example
+     * // Get one SolutionCandidate
+     * const solutionCandidate = await prisma.solutionCandidate.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SolutionCandidateFindUniqueArgs>(args: SelectSubset<T, SolutionCandidateFindUniqueArgs<ExtArgs>>): Prisma__SolutionCandidateClient<$Result.GetResult<Prisma.$SolutionCandidatePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SolutionCandidate that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SolutionCandidateFindUniqueOrThrowArgs} args - Arguments to find a SolutionCandidate
+     * @example
+     * // Get one SolutionCandidate
+     * const solutionCandidate = await prisma.solutionCandidate.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SolutionCandidateFindUniqueOrThrowArgs>(args: SelectSubset<T, SolutionCandidateFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SolutionCandidateClient<$Result.GetResult<Prisma.$SolutionCandidatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SolutionCandidate that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SolutionCandidateFindFirstArgs} args - Arguments to find a SolutionCandidate
+     * @example
+     * // Get one SolutionCandidate
+     * const solutionCandidate = await prisma.solutionCandidate.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SolutionCandidateFindFirstArgs>(args?: SelectSubset<T, SolutionCandidateFindFirstArgs<ExtArgs>>): Prisma__SolutionCandidateClient<$Result.GetResult<Prisma.$SolutionCandidatePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SolutionCandidate that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SolutionCandidateFindFirstOrThrowArgs} args - Arguments to find a SolutionCandidate
+     * @example
+     * // Get one SolutionCandidate
+     * const solutionCandidate = await prisma.solutionCandidate.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SolutionCandidateFindFirstOrThrowArgs>(args?: SelectSubset<T, SolutionCandidateFindFirstOrThrowArgs<ExtArgs>>): Prisma__SolutionCandidateClient<$Result.GetResult<Prisma.$SolutionCandidatePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SolutionCandidates that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SolutionCandidateFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SolutionCandidates
+     * const solutionCandidates = await prisma.solutionCandidate.findMany()
+     * 
+     * // Get first 10 SolutionCandidates
+     * const solutionCandidates = await prisma.solutionCandidate.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const solutionCandidateWithIdOnly = await prisma.solutionCandidate.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SolutionCandidateFindManyArgs>(args?: SelectSubset<T, SolutionCandidateFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SolutionCandidatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SolutionCandidate.
+     * @param {SolutionCandidateCreateArgs} args - Arguments to create a SolutionCandidate.
+     * @example
+     * // Create one SolutionCandidate
+     * const SolutionCandidate = await prisma.solutionCandidate.create({
+     *   data: {
+     *     // ... data to create a SolutionCandidate
+     *   }
+     * })
+     * 
+     */
+    create<T extends SolutionCandidateCreateArgs>(args: SelectSubset<T, SolutionCandidateCreateArgs<ExtArgs>>): Prisma__SolutionCandidateClient<$Result.GetResult<Prisma.$SolutionCandidatePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SolutionCandidates.
+     * @param {SolutionCandidateCreateManyArgs} args - Arguments to create many SolutionCandidates.
+     * @example
+     * // Create many SolutionCandidates
+     * const solutionCandidate = await prisma.solutionCandidate.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SolutionCandidateCreateManyArgs>(args?: SelectSubset<T, SolutionCandidateCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SolutionCandidates and returns the data saved in the database.
+     * @param {SolutionCandidateCreateManyAndReturnArgs} args - Arguments to create many SolutionCandidates.
+     * @example
+     * // Create many SolutionCandidates
+     * const solutionCandidate = await prisma.solutionCandidate.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SolutionCandidates and only return the `id`
+     * const solutionCandidateWithIdOnly = await prisma.solutionCandidate.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SolutionCandidateCreateManyAndReturnArgs>(args?: SelectSubset<T, SolutionCandidateCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SolutionCandidatePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SolutionCandidate.
+     * @param {SolutionCandidateDeleteArgs} args - Arguments to delete one SolutionCandidate.
+     * @example
+     * // Delete one SolutionCandidate
+     * const SolutionCandidate = await prisma.solutionCandidate.delete({
+     *   where: {
+     *     // ... filter to delete one SolutionCandidate
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SolutionCandidateDeleteArgs>(args: SelectSubset<T, SolutionCandidateDeleteArgs<ExtArgs>>): Prisma__SolutionCandidateClient<$Result.GetResult<Prisma.$SolutionCandidatePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SolutionCandidate.
+     * @param {SolutionCandidateUpdateArgs} args - Arguments to update one SolutionCandidate.
+     * @example
+     * // Update one SolutionCandidate
+     * const solutionCandidate = await prisma.solutionCandidate.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SolutionCandidateUpdateArgs>(args: SelectSubset<T, SolutionCandidateUpdateArgs<ExtArgs>>): Prisma__SolutionCandidateClient<$Result.GetResult<Prisma.$SolutionCandidatePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SolutionCandidates.
+     * @param {SolutionCandidateDeleteManyArgs} args - Arguments to filter SolutionCandidates to delete.
+     * @example
+     * // Delete a few SolutionCandidates
+     * const { count } = await prisma.solutionCandidate.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SolutionCandidateDeleteManyArgs>(args?: SelectSubset<T, SolutionCandidateDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SolutionCandidates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SolutionCandidateUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SolutionCandidates
+     * const solutionCandidate = await prisma.solutionCandidate.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SolutionCandidateUpdateManyArgs>(args: SelectSubset<T, SolutionCandidateUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SolutionCandidates and returns the data updated in the database.
+     * @param {SolutionCandidateUpdateManyAndReturnArgs} args - Arguments to update many SolutionCandidates.
+     * @example
+     * // Update many SolutionCandidates
+     * const solutionCandidate = await prisma.solutionCandidate.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SolutionCandidates and only return the `id`
+     * const solutionCandidateWithIdOnly = await prisma.solutionCandidate.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SolutionCandidateUpdateManyAndReturnArgs>(args: SelectSubset<T, SolutionCandidateUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SolutionCandidatePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SolutionCandidate.
+     * @param {SolutionCandidateUpsertArgs} args - Arguments to update or create a SolutionCandidate.
+     * @example
+     * // Update or create a SolutionCandidate
+     * const solutionCandidate = await prisma.solutionCandidate.upsert({
+     *   create: {
+     *     // ... data to create a SolutionCandidate
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SolutionCandidate we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SolutionCandidateUpsertArgs>(args: SelectSubset<T, SolutionCandidateUpsertArgs<ExtArgs>>): Prisma__SolutionCandidateClient<$Result.GetResult<Prisma.$SolutionCandidatePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SolutionCandidates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SolutionCandidateCountArgs} args - Arguments to filter SolutionCandidates to count.
+     * @example
+     * // Count the number of SolutionCandidates
+     * const count = await prisma.solutionCandidate.count({
+     *   where: {
+     *     // ... the filter for the SolutionCandidates we want to count
+     *   }
+     * })
+    **/
+    count<T extends SolutionCandidateCountArgs>(
+      args?: Subset<T, SolutionCandidateCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SolutionCandidateCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SolutionCandidate.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SolutionCandidateAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SolutionCandidateAggregateArgs>(args: Subset<T, SolutionCandidateAggregateArgs>): Prisma.PrismaPromise<GetSolutionCandidateAggregateType<T>>
+
+    /**
+     * Group by SolutionCandidate.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SolutionCandidateGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SolutionCandidateGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SolutionCandidateGroupByArgs['orderBy'] }
+        : { orderBy?: SolutionCandidateGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SolutionCandidateGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSolutionCandidateGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SolutionCandidate model
+   */
+  readonly fields: SolutionCandidateFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SolutionCandidate.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SolutionCandidateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    report<T extends ReportDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ReportDefaultArgs<ExtArgs>>): Prisma__ReportClient<$Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SolutionCandidate model
+   */
+  interface SolutionCandidateFieldRefs {
+    readonly id: FieldRef<"SolutionCandidate", 'String'>
+    readonly createdAt: FieldRef<"SolutionCandidate", 'DateTime'>
+    readonly title: FieldRef<"SolutionCandidate", 'String'>
+    readonly steps: FieldRef<"SolutionCandidate", 'String'>
+    readonly action: FieldRef<"SolutionCandidate", 'String'>
+    readonly detail: FieldRef<"SolutionCandidate", 'String'>
+    readonly score: FieldRef<"SolutionCandidate", 'Float'>
+    readonly rank: FieldRef<"SolutionCandidate", 'Int'>
+    readonly sourceId: FieldRef<"SolutionCandidate", 'Int'>
+    readonly avgDelay: FieldRef<"SolutionCandidate", 'Int'>
+    readonly timesUsed: FieldRef<"SolutionCandidate", 'Int'>
+    readonly reportId: FieldRef<"SolutionCandidate", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SolutionCandidate findUnique
+   */
+  export type SolutionCandidateFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolutionCandidate
+     */
+    select?: SolutionCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolutionCandidate
+     */
+    omit?: SolutionCandidateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolutionCandidateInclude<ExtArgs> | null
+    /**
+     * Filter, which SolutionCandidate to fetch.
+     */
+    where: SolutionCandidateWhereUniqueInput
+  }
+
+  /**
+   * SolutionCandidate findUniqueOrThrow
+   */
+  export type SolutionCandidateFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolutionCandidate
+     */
+    select?: SolutionCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolutionCandidate
+     */
+    omit?: SolutionCandidateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolutionCandidateInclude<ExtArgs> | null
+    /**
+     * Filter, which SolutionCandidate to fetch.
+     */
+    where: SolutionCandidateWhereUniqueInput
+  }
+
+  /**
+   * SolutionCandidate findFirst
+   */
+  export type SolutionCandidateFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolutionCandidate
+     */
+    select?: SolutionCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolutionCandidate
+     */
+    omit?: SolutionCandidateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolutionCandidateInclude<ExtArgs> | null
+    /**
+     * Filter, which SolutionCandidate to fetch.
+     */
+    where?: SolutionCandidateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SolutionCandidates to fetch.
+     */
+    orderBy?: SolutionCandidateOrderByWithRelationInput | SolutionCandidateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SolutionCandidates.
+     */
+    cursor?: SolutionCandidateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SolutionCandidates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SolutionCandidates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SolutionCandidates.
+     */
+    distinct?: SolutionCandidateScalarFieldEnum | SolutionCandidateScalarFieldEnum[]
+  }
+
+  /**
+   * SolutionCandidate findFirstOrThrow
+   */
+  export type SolutionCandidateFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolutionCandidate
+     */
+    select?: SolutionCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolutionCandidate
+     */
+    omit?: SolutionCandidateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolutionCandidateInclude<ExtArgs> | null
+    /**
+     * Filter, which SolutionCandidate to fetch.
+     */
+    where?: SolutionCandidateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SolutionCandidates to fetch.
+     */
+    orderBy?: SolutionCandidateOrderByWithRelationInput | SolutionCandidateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SolutionCandidates.
+     */
+    cursor?: SolutionCandidateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SolutionCandidates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SolutionCandidates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SolutionCandidates.
+     */
+    distinct?: SolutionCandidateScalarFieldEnum | SolutionCandidateScalarFieldEnum[]
+  }
+
+  /**
+   * SolutionCandidate findMany
+   */
+  export type SolutionCandidateFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolutionCandidate
+     */
+    select?: SolutionCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolutionCandidate
+     */
+    omit?: SolutionCandidateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolutionCandidateInclude<ExtArgs> | null
+    /**
+     * Filter, which SolutionCandidates to fetch.
+     */
+    where?: SolutionCandidateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SolutionCandidates to fetch.
+     */
+    orderBy?: SolutionCandidateOrderByWithRelationInput | SolutionCandidateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SolutionCandidates.
+     */
+    cursor?: SolutionCandidateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SolutionCandidates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SolutionCandidates.
+     */
+    skip?: number
+    distinct?: SolutionCandidateScalarFieldEnum | SolutionCandidateScalarFieldEnum[]
+  }
+
+  /**
+   * SolutionCandidate create
+   */
+  export type SolutionCandidateCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolutionCandidate
+     */
+    select?: SolutionCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolutionCandidate
+     */
+    omit?: SolutionCandidateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolutionCandidateInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SolutionCandidate.
+     */
+    data: XOR<SolutionCandidateCreateInput, SolutionCandidateUncheckedCreateInput>
+  }
+
+  /**
+   * SolutionCandidate createMany
+   */
+  export type SolutionCandidateCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SolutionCandidates.
+     */
+    data: SolutionCandidateCreateManyInput | SolutionCandidateCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SolutionCandidate createManyAndReturn
+   */
+  export type SolutionCandidateCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolutionCandidate
+     */
+    select?: SolutionCandidateSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolutionCandidate
+     */
+    omit?: SolutionCandidateOmit<ExtArgs> | null
+    /**
+     * The data used to create many SolutionCandidates.
+     */
+    data: SolutionCandidateCreateManyInput | SolutionCandidateCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolutionCandidateIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SolutionCandidate update
+   */
+  export type SolutionCandidateUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolutionCandidate
+     */
+    select?: SolutionCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolutionCandidate
+     */
+    omit?: SolutionCandidateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolutionCandidateInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SolutionCandidate.
+     */
+    data: XOR<SolutionCandidateUpdateInput, SolutionCandidateUncheckedUpdateInput>
+    /**
+     * Choose, which SolutionCandidate to update.
+     */
+    where: SolutionCandidateWhereUniqueInput
+  }
+
+  /**
+   * SolutionCandidate updateMany
+   */
+  export type SolutionCandidateUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SolutionCandidates.
+     */
+    data: XOR<SolutionCandidateUpdateManyMutationInput, SolutionCandidateUncheckedUpdateManyInput>
+    /**
+     * Filter which SolutionCandidates to update
+     */
+    where?: SolutionCandidateWhereInput
+    /**
+     * Limit how many SolutionCandidates to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SolutionCandidate updateManyAndReturn
+   */
+  export type SolutionCandidateUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolutionCandidate
+     */
+    select?: SolutionCandidateSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolutionCandidate
+     */
+    omit?: SolutionCandidateOmit<ExtArgs> | null
+    /**
+     * The data used to update SolutionCandidates.
+     */
+    data: XOR<SolutionCandidateUpdateManyMutationInput, SolutionCandidateUncheckedUpdateManyInput>
+    /**
+     * Filter which SolutionCandidates to update
+     */
+    where?: SolutionCandidateWhereInput
+    /**
+     * Limit how many SolutionCandidates to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolutionCandidateIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SolutionCandidate upsert
+   */
+  export type SolutionCandidateUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolutionCandidate
+     */
+    select?: SolutionCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolutionCandidate
+     */
+    omit?: SolutionCandidateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolutionCandidateInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SolutionCandidate to update in case it exists.
+     */
+    where: SolutionCandidateWhereUniqueInput
+    /**
+     * In case the SolutionCandidate found by the `where` argument doesn't exist, create a new SolutionCandidate with this data.
+     */
+    create: XOR<SolutionCandidateCreateInput, SolutionCandidateUncheckedCreateInput>
+    /**
+     * In case the SolutionCandidate was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SolutionCandidateUpdateInput, SolutionCandidateUncheckedUpdateInput>
+  }
+
+  /**
+   * SolutionCandidate delete
+   */
+  export type SolutionCandidateDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolutionCandidate
+     */
+    select?: SolutionCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolutionCandidate
+     */
+    omit?: SolutionCandidateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolutionCandidateInclude<ExtArgs> | null
+    /**
+     * Filter which SolutionCandidate to delete.
+     */
+    where: SolutionCandidateWhereUniqueInput
+  }
+
+  /**
+   * SolutionCandidate deleteMany
+   */
+  export type SolutionCandidateDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SolutionCandidates to delete
+     */
+    where?: SolutionCandidateWhereInput
+    /**
+     * Limit how many SolutionCandidates to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SolutionCandidate without action
+   */
+  export type SolutionCandidateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SolutionCandidate
+     */
+    select?: SolutionCandidateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SolutionCandidate
+     */
+    omit?: SolutionCandidateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SolutionCandidateInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -4686,10 +6065,30 @@ export namespace Prisma {
     embeddingModel: 'embeddingModel',
     similarityScore: 'similarityScore',
     retrievedSources: 'retrievedSources',
+    confirmedAt: 'confirmedAt',
+    acknowledgedAt: 'acknowledgedAt',
     reportId: 'reportId'
   };
 
   export type SolutionScalarFieldEnum = (typeof SolutionScalarFieldEnum)[keyof typeof SolutionScalarFieldEnum]
+
+
+  export const SolutionCandidateScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    title: 'title',
+    steps: 'steps',
+    action: 'action',
+    detail: 'detail',
+    score: 'score',
+    rank: 'rank',
+    sourceId: 'sourceId',
+    avgDelay: 'avgDelay',
+    timesUsed: 'timesUsed',
+    reportId: 'reportId'
+  };
+
+  export type SolutionCandidateScalarFieldEnum = (typeof SolutionCandidateScalarFieldEnum)[keyof typeof SolutionCandidateScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -4949,6 +6348,7 @@ export namespace Prisma {
     conductorId?: UuidFilter<"Report"> | string
     adminId?: UuidNullableFilter<"Report"> | string | null
     solution?: XOR<SolutionNullableScalarRelationFilter, SolutionWhereInput> | null
+    candidates?: SolutionCandidateListRelationFilter
     conductor?: XOR<UserScalarRelationFilter, UserWhereInput>
     admin?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }
@@ -4966,6 +6366,7 @@ export namespace Prisma {
     conductorId?: SortOrder
     adminId?: SortOrderInput | SortOrder
     solution?: SolutionOrderByWithRelationInput
+    candidates?: SolutionCandidateOrderByRelationAggregateInput
     conductor?: UserOrderByWithRelationInput
     admin?: UserOrderByWithRelationInput
   }
@@ -4986,6 +6387,7 @@ export namespace Prisma {
     conductorId?: UuidFilter<"Report"> | string
     adminId?: UuidNullableFilter<"Report"> | string | null
     solution?: XOR<SolutionNullableScalarRelationFilter, SolutionWhereInput> | null
+    candidates?: SolutionCandidateListRelationFilter
     conductor?: XOR<UserScalarRelationFilter, UserWhereInput>
     admin?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }, "id">
@@ -5039,6 +6441,8 @@ export namespace Prisma {
     embeddingModel?: StringNullableFilter<"Solution"> | string | null
     similarityScore?: FloatNullableFilter<"Solution"> | number | null
     retrievedSources?: JsonNullableFilter<"Solution">
+    confirmedAt?: DateTimeNullableFilter<"Solution"> | Date | string | null
+    acknowledgedAt?: DateTimeNullableFilter<"Solution"> | Date | string | null
     reportId?: UuidFilter<"Solution"> | string
     report?: XOR<ReportScalarRelationFilter, ReportWhereInput>
   }
@@ -5055,6 +6459,8 @@ export namespace Prisma {
     embeddingModel?: SortOrderInput | SortOrder
     similarityScore?: SortOrderInput | SortOrder
     retrievedSources?: SortOrderInput | SortOrder
+    confirmedAt?: SortOrderInput | SortOrder
+    acknowledgedAt?: SortOrderInput | SortOrder
     reportId?: SortOrder
     report?: ReportOrderByWithRelationInput
   }
@@ -5075,6 +6481,8 @@ export namespace Prisma {
     embeddingModel?: StringNullableFilter<"Solution"> | string | null
     similarityScore?: FloatNullableFilter<"Solution"> | number | null
     retrievedSources?: JsonNullableFilter<"Solution">
+    confirmedAt?: DateTimeNullableFilter<"Solution"> | Date | string | null
+    acknowledgedAt?: DateTimeNullableFilter<"Solution"> | Date | string | null
     report?: XOR<ReportScalarRelationFilter, ReportWhereInput>
   }, "id" | "reportId">
 
@@ -5090,6 +6498,8 @@ export namespace Prisma {
     embeddingModel?: SortOrderInput | SortOrder
     similarityScore?: SortOrderInput | SortOrder
     retrievedSources?: SortOrderInput | SortOrder
+    confirmedAt?: SortOrderInput | SortOrder
+    acknowledgedAt?: SortOrderInput | SortOrder
     reportId?: SortOrder
     _count?: SolutionCountOrderByAggregateInput
     _avg?: SolutionAvgOrderByAggregateInput
@@ -5113,7 +6523,101 @@ export namespace Prisma {
     embeddingModel?: StringNullableWithAggregatesFilter<"Solution"> | string | null
     similarityScore?: FloatNullableWithAggregatesFilter<"Solution"> | number | null
     retrievedSources?: JsonNullableWithAggregatesFilter<"Solution">
+    confirmedAt?: DateTimeNullableWithAggregatesFilter<"Solution"> | Date | string | null
+    acknowledgedAt?: DateTimeNullableWithAggregatesFilter<"Solution"> | Date | string | null
     reportId?: UuidWithAggregatesFilter<"Solution"> | string
+  }
+
+  export type SolutionCandidateWhereInput = {
+    AND?: SolutionCandidateWhereInput | SolutionCandidateWhereInput[]
+    OR?: SolutionCandidateWhereInput[]
+    NOT?: SolutionCandidateWhereInput | SolutionCandidateWhereInput[]
+    id?: UuidFilter<"SolutionCandidate"> | string
+    createdAt?: DateTimeFilter<"SolutionCandidate"> | Date | string
+    title?: StringFilter<"SolutionCandidate"> | string
+    steps?: StringFilter<"SolutionCandidate"> | string
+    action?: StringFilter<"SolutionCandidate"> | string
+    detail?: StringFilter<"SolutionCandidate"> | string
+    score?: FloatFilter<"SolutionCandidate"> | number
+    rank?: IntFilter<"SolutionCandidate"> | number
+    sourceId?: IntFilter<"SolutionCandidate"> | number
+    avgDelay?: IntNullableFilter<"SolutionCandidate"> | number | null
+    timesUsed?: IntNullableFilter<"SolutionCandidate"> | number | null
+    reportId?: UuidFilter<"SolutionCandidate"> | string
+    report?: XOR<ReportScalarRelationFilter, ReportWhereInput>
+  }
+
+  export type SolutionCandidateOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    title?: SortOrder
+    steps?: SortOrder
+    action?: SortOrder
+    detail?: SortOrder
+    score?: SortOrder
+    rank?: SortOrder
+    sourceId?: SortOrder
+    avgDelay?: SortOrderInput | SortOrder
+    timesUsed?: SortOrderInput | SortOrder
+    reportId?: SortOrder
+    report?: ReportOrderByWithRelationInput
+  }
+
+  export type SolutionCandidateWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: SolutionCandidateWhereInput | SolutionCandidateWhereInput[]
+    OR?: SolutionCandidateWhereInput[]
+    NOT?: SolutionCandidateWhereInput | SolutionCandidateWhereInput[]
+    createdAt?: DateTimeFilter<"SolutionCandidate"> | Date | string
+    title?: StringFilter<"SolutionCandidate"> | string
+    steps?: StringFilter<"SolutionCandidate"> | string
+    action?: StringFilter<"SolutionCandidate"> | string
+    detail?: StringFilter<"SolutionCandidate"> | string
+    score?: FloatFilter<"SolutionCandidate"> | number
+    rank?: IntFilter<"SolutionCandidate"> | number
+    sourceId?: IntFilter<"SolutionCandidate"> | number
+    avgDelay?: IntNullableFilter<"SolutionCandidate"> | number | null
+    timesUsed?: IntNullableFilter<"SolutionCandidate"> | number | null
+    reportId?: UuidFilter<"SolutionCandidate"> | string
+    report?: XOR<ReportScalarRelationFilter, ReportWhereInput>
+  }, "id">
+
+  export type SolutionCandidateOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    title?: SortOrder
+    steps?: SortOrder
+    action?: SortOrder
+    detail?: SortOrder
+    score?: SortOrder
+    rank?: SortOrder
+    sourceId?: SortOrder
+    avgDelay?: SortOrderInput | SortOrder
+    timesUsed?: SortOrderInput | SortOrder
+    reportId?: SortOrder
+    _count?: SolutionCandidateCountOrderByAggregateInput
+    _avg?: SolutionCandidateAvgOrderByAggregateInput
+    _max?: SolutionCandidateMaxOrderByAggregateInput
+    _min?: SolutionCandidateMinOrderByAggregateInput
+    _sum?: SolutionCandidateSumOrderByAggregateInput
+  }
+
+  export type SolutionCandidateScalarWhereWithAggregatesInput = {
+    AND?: SolutionCandidateScalarWhereWithAggregatesInput | SolutionCandidateScalarWhereWithAggregatesInput[]
+    OR?: SolutionCandidateScalarWhereWithAggregatesInput[]
+    NOT?: SolutionCandidateScalarWhereWithAggregatesInput | SolutionCandidateScalarWhereWithAggregatesInput[]
+    id?: UuidWithAggregatesFilter<"SolutionCandidate"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"SolutionCandidate"> | Date | string
+    title?: StringWithAggregatesFilter<"SolutionCandidate"> | string
+    steps?: StringWithAggregatesFilter<"SolutionCandidate"> | string
+    action?: StringWithAggregatesFilter<"SolutionCandidate"> | string
+    detail?: StringWithAggregatesFilter<"SolutionCandidate"> | string
+    score?: FloatWithAggregatesFilter<"SolutionCandidate"> | number
+    rank?: IntWithAggregatesFilter<"SolutionCandidate"> | number
+    sourceId?: IntWithAggregatesFilter<"SolutionCandidate"> | number
+    avgDelay?: IntNullableWithAggregatesFilter<"SolutionCandidate"> | number | null
+    timesUsed?: IntNullableWithAggregatesFilter<"SolutionCandidate"> | number | null
+    reportId?: UuidWithAggregatesFilter<"SolutionCandidate"> | string
   }
 
   export type UserCreateInput = {
@@ -5212,6 +6716,7 @@ export namespace Prisma {
     urgency?: $Enums.Urgency
     status?: $Enums.Status
     solution?: SolutionCreateNestedOneWithoutReportInput
+    candidates?: SolutionCandidateCreateNestedManyWithoutReportInput
     conductor: UserCreateNestedOneWithoutReportsInput
     admin?: UserCreateNestedOneWithoutResolvedInput
   }
@@ -5229,6 +6734,7 @@ export namespace Prisma {
     conductorId: string
     adminId?: string | null
     solution?: SolutionUncheckedCreateNestedOneWithoutReportInput
+    candidates?: SolutionCandidateUncheckedCreateNestedManyWithoutReportInput
   }
 
   export type ReportUpdateInput = {
@@ -5242,6 +6748,7 @@ export namespace Prisma {
     urgency?: EnumUrgencyFieldUpdateOperationsInput | $Enums.Urgency
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
     solution?: SolutionUpdateOneWithoutReportNestedInput
+    candidates?: SolutionCandidateUpdateManyWithoutReportNestedInput
     conductor?: UserUpdateOneRequiredWithoutReportsNestedInput
     admin?: UserUpdateOneWithoutResolvedNestedInput
   }
@@ -5259,6 +6766,7 @@ export namespace Prisma {
     conductorId?: StringFieldUpdateOperationsInput | string
     adminId?: NullableStringFieldUpdateOperationsInput | string | null
     solution?: SolutionUncheckedUpdateOneWithoutReportNestedInput
+    candidates?: SolutionCandidateUncheckedUpdateManyWithoutReportNestedInput
   }
 
   export type ReportCreateManyInput = {
@@ -5313,6 +6821,8 @@ export namespace Prisma {
     embeddingModel?: string | null
     similarityScore?: number | null
     retrievedSources?: NullableJsonNullValueInput | InputJsonValue
+    confirmedAt?: Date | string | null
+    acknowledgedAt?: Date | string | null
     report: ReportCreateNestedOneWithoutSolutionInput
   }
 
@@ -5328,6 +6838,8 @@ export namespace Prisma {
     embeddingModel?: string | null
     similarityScore?: number | null
     retrievedSources?: NullableJsonNullValueInput | InputJsonValue
+    confirmedAt?: Date | string | null
+    acknowledgedAt?: Date | string | null
     reportId: string
   }
 
@@ -5343,6 +6855,8 @@ export namespace Prisma {
     embeddingModel?: NullableStringFieldUpdateOperationsInput | string | null
     similarityScore?: NullableFloatFieldUpdateOperationsInput | number | null
     retrievedSources?: NullableJsonNullValueInput | InputJsonValue
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    acknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     report?: ReportUpdateOneRequiredWithoutSolutionNestedInput
   }
 
@@ -5358,6 +6872,8 @@ export namespace Prisma {
     embeddingModel?: NullableStringFieldUpdateOperationsInput | string | null
     similarityScore?: NullableFloatFieldUpdateOperationsInput | number | null
     retrievedSources?: NullableJsonNullValueInput | InputJsonValue
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    acknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reportId?: StringFieldUpdateOperationsInput | string
   }
 
@@ -5373,6 +6889,8 @@ export namespace Prisma {
     embeddingModel?: string | null
     similarityScore?: number | null
     retrievedSources?: NullableJsonNullValueInput | InputJsonValue
+    confirmedAt?: Date | string | null
+    acknowledgedAt?: Date | string | null
     reportId: string
   }
 
@@ -5388,6 +6906,8 @@ export namespace Prisma {
     embeddingModel?: NullableStringFieldUpdateOperationsInput | string | null
     similarityScore?: NullableFloatFieldUpdateOperationsInput | number | null
     retrievedSources?: NullableJsonNullValueInput | InputJsonValue
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    acknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type SolutionUncheckedUpdateManyInput = {
@@ -5402,6 +6922,112 @@ export namespace Prisma {
     embeddingModel?: NullableStringFieldUpdateOperationsInput | string | null
     similarityScore?: NullableFloatFieldUpdateOperationsInput | number | null
     retrievedSources?: NullableJsonNullValueInput | InputJsonValue
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    acknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reportId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SolutionCandidateCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    title: string
+    steps: string
+    action: string
+    detail: string
+    score: number
+    rank: number
+    sourceId: number
+    avgDelay?: number | null
+    timesUsed?: number | null
+    report: ReportCreateNestedOneWithoutCandidatesInput
+  }
+
+  export type SolutionCandidateUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    title: string
+    steps: string
+    action: string
+    detail: string
+    score: number
+    rank: number
+    sourceId: number
+    avgDelay?: number | null
+    timesUsed?: number | null
+    reportId: string
+  }
+
+  export type SolutionCandidateUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    steps?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    detail?: StringFieldUpdateOperationsInput | string
+    score?: FloatFieldUpdateOperationsInput | number
+    rank?: IntFieldUpdateOperationsInput | number
+    sourceId?: IntFieldUpdateOperationsInput | number
+    avgDelay?: NullableIntFieldUpdateOperationsInput | number | null
+    timesUsed?: NullableIntFieldUpdateOperationsInput | number | null
+    report?: ReportUpdateOneRequiredWithoutCandidatesNestedInput
+  }
+
+  export type SolutionCandidateUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    steps?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    detail?: StringFieldUpdateOperationsInput | string
+    score?: FloatFieldUpdateOperationsInput | number
+    rank?: IntFieldUpdateOperationsInput | number
+    sourceId?: IntFieldUpdateOperationsInput | number
+    avgDelay?: NullableIntFieldUpdateOperationsInput | number | null
+    timesUsed?: NullableIntFieldUpdateOperationsInput | number | null
+    reportId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SolutionCandidateCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    title: string
+    steps: string
+    action: string
+    detail: string
+    score: number
+    rank: number
+    sourceId: number
+    avgDelay?: number | null
+    timesUsed?: number | null
+    reportId: string
+  }
+
+  export type SolutionCandidateUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    steps?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    detail?: StringFieldUpdateOperationsInput | string
+    score?: FloatFieldUpdateOperationsInput | number
+    rank?: IntFieldUpdateOperationsInput | number
+    sourceId?: IntFieldUpdateOperationsInput | number
+    avgDelay?: NullableIntFieldUpdateOperationsInput | number | null
+    timesUsed?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type SolutionCandidateUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    steps?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    detail?: StringFieldUpdateOperationsInput | string
+    score?: FloatFieldUpdateOperationsInput | number
+    rank?: IntFieldUpdateOperationsInput | number
+    sourceId?: IntFieldUpdateOperationsInput | number
+    avgDelay?: NullableIntFieldUpdateOperationsInput | number | null
+    timesUsed?: NullableIntFieldUpdateOperationsInput | number | null
     reportId?: StringFieldUpdateOperationsInput | string
   }
 
@@ -5627,6 +7253,12 @@ export namespace Prisma {
     isNot?: SolutionWhereInput | null
   }
 
+  export type SolutionCandidateListRelationFilter = {
+    every?: SolutionCandidateWhereInput
+    some?: SolutionCandidateWhereInput
+    none?: SolutionCandidateWhereInput
+  }
+
   export type UserScalarRelationFilter = {
     is?: UserWhereInput
     isNot?: UserWhereInput
@@ -5635,6 +7267,10 @@ export namespace Prisma {
   export type UserNullableScalarRelationFilter = {
     is?: UserWhereInput | null
     isNot?: UserWhereInput | null
+  }
+
+  export type SolutionCandidateOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type ReportCountOrderByAggregateInput = {
@@ -5751,6 +7387,17 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type ReportScalarRelationFilter = {
     is?: ReportWhereInput
     isNot?: ReportWhereInput
@@ -5768,6 +7415,8 @@ export namespace Prisma {
     embeddingModel?: SortOrder
     similarityScore?: SortOrder
     retrievedSources?: SortOrder
+    confirmedAt?: SortOrder
+    acknowledgedAt?: SortOrder
     reportId?: SortOrder
   }
 
@@ -5787,6 +7436,8 @@ export namespace Prisma {
     retrievalMethod?: SortOrder
     embeddingModel?: SortOrder
     similarityScore?: SortOrder
+    confirmedAt?: SortOrder
+    acknowledgedAt?: SortOrder
     reportId?: SortOrder
   }
 
@@ -5801,6 +7452,8 @@ export namespace Prisma {
     retrievalMethod?: SortOrder
     embeddingModel?: SortOrder
     similarityScore?: SortOrder
+    confirmedAt?: SortOrder
+    acknowledgedAt?: SortOrder
     reportId?: SortOrder
   }
 
@@ -5857,6 +7510,162 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedJsonNullableFilter<$PrismaModel>
     _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type FloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type SolutionCandidateCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    title?: SortOrder
+    steps?: SortOrder
+    action?: SortOrder
+    detail?: SortOrder
+    score?: SortOrder
+    rank?: SortOrder
+    sourceId?: SortOrder
+    avgDelay?: SortOrder
+    timesUsed?: SortOrder
+    reportId?: SortOrder
+  }
+
+  export type SolutionCandidateAvgOrderByAggregateInput = {
+    score?: SortOrder
+    rank?: SortOrder
+    sourceId?: SortOrder
+    avgDelay?: SortOrder
+    timesUsed?: SortOrder
+  }
+
+  export type SolutionCandidateMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    title?: SortOrder
+    steps?: SortOrder
+    action?: SortOrder
+    detail?: SortOrder
+    score?: SortOrder
+    rank?: SortOrder
+    sourceId?: SortOrder
+    avgDelay?: SortOrder
+    timesUsed?: SortOrder
+    reportId?: SortOrder
+  }
+
+  export type SolutionCandidateMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    title?: SortOrder
+    steps?: SortOrder
+    action?: SortOrder
+    detail?: SortOrder
+    score?: SortOrder
+    rank?: SortOrder
+    sourceId?: SortOrder
+    avgDelay?: SortOrder
+    timesUsed?: SortOrder
+    reportId?: SortOrder
+  }
+
+  export type SolutionCandidateSumOrderByAggregateInput = {
+    score?: SortOrder
+    rank?: SortOrder
+    sourceId?: SortOrder
+    avgDelay?: SortOrder
+    timesUsed?: SortOrder
+  }
+
+  export type FloatWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedFloatFilter<$PrismaModel>
+    _min?: NestedFloatFilter<$PrismaModel>
+    _max?: NestedFloatFilter<$PrismaModel>
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type ReportCreateNestedManyWithoutConductorInput = {
@@ -5969,6 +7778,13 @@ export namespace Prisma {
     connect?: SolutionWhereUniqueInput
   }
 
+  export type SolutionCandidateCreateNestedManyWithoutReportInput = {
+    create?: XOR<SolutionCandidateCreateWithoutReportInput, SolutionCandidateUncheckedCreateWithoutReportInput> | SolutionCandidateCreateWithoutReportInput[] | SolutionCandidateUncheckedCreateWithoutReportInput[]
+    connectOrCreate?: SolutionCandidateCreateOrConnectWithoutReportInput | SolutionCandidateCreateOrConnectWithoutReportInput[]
+    createMany?: SolutionCandidateCreateManyReportInputEnvelope
+    connect?: SolutionCandidateWhereUniqueInput | SolutionCandidateWhereUniqueInput[]
+  }
+
   export type UserCreateNestedOneWithoutReportsInput = {
     create?: XOR<UserCreateWithoutReportsInput, UserUncheckedCreateWithoutReportsInput>
     connectOrCreate?: UserCreateOrConnectWithoutReportsInput
@@ -5985,6 +7801,13 @@ export namespace Prisma {
     create?: XOR<SolutionCreateWithoutReportInput, SolutionUncheckedCreateWithoutReportInput>
     connectOrCreate?: SolutionCreateOrConnectWithoutReportInput
     connect?: SolutionWhereUniqueInput
+  }
+
+  export type SolutionCandidateUncheckedCreateNestedManyWithoutReportInput = {
+    create?: XOR<SolutionCandidateCreateWithoutReportInput, SolutionCandidateUncheckedCreateWithoutReportInput> | SolutionCandidateCreateWithoutReportInput[] | SolutionCandidateUncheckedCreateWithoutReportInput[]
+    connectOrCreate?: SolutionCandidateCreateOrConnectWithoutReportInput | SolutionCandidateCreateOrConnectWithoutReportInput[]
+    createMany?: SolutionCandidateCreateManyReportInputEnvelope
+    connect?: SolutionCandidateWhereUniqueInput | SolutionCandidateWhereUniqueInput[]
   }
 
   export type ReportUpdateimageUrlInput = {
@@ -6008,6 +7831,20 @@ export namespace Prisma {
     delete?: SolutionWhereInput | boolean
     connect?: SolutionWhereUniqueInput
     update?: XOR<XOR<SolutionUpdateToOneWithWhereWithoutReportInput, SolutionUpdateWithoutReportInput>, SolutionUncheckedUpdateWithoutReportInput>
+  }
+
+  export type SolutionCandidateUpdateManyWithoutReportNestedInput = {
+    create?: XOR<SolutionCandidateCreateWithoutReportInput, SolutionCandidateUncheckedCreateWithoutReportInput> | SolutionCandidateCreateWithoutReportInput[] | SolutionCandidateUncheckedCreateWithoutReportInput[]
+    connectOrCreate?: SolutionCandidateCreateOrConnectWithoutReportInput | SolutionCandidateCreateOrConnectWithoutReportInput[]
+    upsert?: SolutionCandidateUpsertWithWhereUniqueWithoutReportInput | SolutionCandidateUpsertWithWhereUniqueWithoutReportInput[]
+    createMany?: SolutionCandidateCreateManyReportInputEnvelope
+    set?: SolutionCandidateWhereUniqueInput | SolutionCandidateWhereUniqueInput[]
+    disconnect?: SolutionCandidateWhereUniqueInput | SolutionCandidateWhereUniqueInput[]
+    delete?: SolutionCandidateWhereUniqueInput | SolutionCandidateWhereUniqueInput[]
+    connect?: SolutionCandidateWhereUniqueInput | SolutionCandidateWhereUniqueInput[]
+    update?: SolutionCandidateUpdateWithWhereUniqueWithoutReportInput | SolutionCandidateUpdateWithWhereUniqueWithoutReportInput[]
+    updateMany?: SolutionCandidateUpdateManyWithWhereWithoutReportInput | SolutionCandidateUpdateManyWithWhereWithoutReportInput[]
+    deleteMany?: SolutionCandidateScalarWhereInput | SolutionCandidateScalarWhereInput[]
   }
 
   export type UserUpdateOneRequiredWithoutReportsNestedInput = {
@@ -6038,6 +7875,20 @@ export namespace Prisma {
     update?: XOR<XOR<SolutionUpdateToOneWithWhereWithoutReportInput, SolutionUpdateWithoutReportInput>, SolutionUncheckedUpdateWithoutReportInput>
   }
 
+  export type SolutionCandidateUncheckedUpdateManyWithoutReportNestedInput = {
+    create?: XOR<SolutionCandidateCreateWithoutReportInput, SolutionCandidateUncheckedCreateWithoutReportInput> | SolutionCandidateCreateWithoutReportInput[] | SolutionCandidateUncheckedCreateWithoutReportInput[]
+    connectOrCreate?: SolutionCandidateCreateOrConnectWithoutReportInput | SolutionCandidateCreateOrConnectWithoutReportInput[]
+    upsert?: SolutionCandidateUpsertWithWhereUniqueWithoutReportInput | SolutionCandidateUpsertWithWhereUniqueWithoutReportInput[]
+    createMany?: SolutionCandidateCreateManyReportInputEnvelope
+    set?: SolutionCandidateWhereUniqueInput | SolutionCandidateWhereUniqueInput[]
+    disconnect?: SolutionCandidateWhereUniqueInput | SolutionCandidateWhereUniqueInput[]
+    delete?: SolutionCandidateWhereUniqueInput | SolutionCandidateWhereUniqueInput[]
+    connect?: SolutionCandidateWhereUniqueInput | SolutionCandidateWhereUniqueInput[]
+    update?: SolutionCandidateUpdateWithWhereUniqueWithoutReportInput | SolutionCandidateUpdateWithWhereUniqueWithoutReportInput[]
+    updateMany?: SolutionCandidateUpdateManyWithWhereWithoutReportInput | SolutionCandidateUpdateManyWithWhereWithoutReportInput[]
+    deleteMany?: SolutionCandidateScalarWhereInput | SolutionCandidateScalarWhereInput[]
+  }
+
   export type ReportCreateNestedOneWithoutSolutionInput = {
     create?: XOR<ReportCreateWithoutSolutionInput, ReportUncheckedCreateWithoutSolutionInput>
     connectOrCreate?: ReportCreateOrConnectWithoutSolutionInput
@@ -6056,12 +7907,54 @@ export namespace Prisma {
     set?: boolean
   }
 
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
   export type ReportUpdateOneRequiredWithoutSolutionNestedInput = {
     create?: XOR<ReportCreateWithoutSolutionInput, ReportUncheckedCreateWithoutSolutionInput>
     connectOrCreate?: ReportCreateOrConnectWithoutSolutionInput
     upsert?: ReportUpsertWithoutSolutionInput
     connect?: ReportWhereUniqueInput
     update?: XOR<XOR<ReportUpdateToOneWithWhereWithoutSolutionInput, ReportUpdateWithoutSolutionInput>, ReportUncheckedUpdateWithoutSolutionInput>
+  }
+
+  export type ReportCreateNestedOneWithoutCandidatesInput = {
+    create?: XOR<ReportCreateWithoutCandidatesInput, ReportUncheckedCreateWithoutCandidatesInput>
+    connectOrCreate?: ReportCreateOrConnectWithoutCandidatesInput
+    connect?: ReportWhereUniqueInput
+  }
+
+  export type FloatFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type ReportUpdateOneRequiredWithoutCandidatesNestedInput = {
+    create?: XOR<ReportCreateWithoutCandidatesInput, ReportUncheckedCreateWithoutCandidatesInput>
+    connectOrCreate?: ReportCreateOrConnectWithoutCandidatesInput
+    upsert?: ReportUpsertWithoutCandidatesInput
+    connect?: ReportWhereUniqueInput
+    update?: XOR<XOR<ReportUpdateToOneWithWhereWithoutCandidatesInput, ReportUpdateWithoutCandidatesInput>, ReportUncheckedUpdateWithoutCandidatesInput>
   }
 
   export type NestedUuidFilter<$PrismaModel = never> = {
@@ -6290,6 +8183,17 @@ export namespace Prisma {
     not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
     in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
@@ -6337,6 +8241,79 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedFloatFilter<$PrismaModel>
+    _min?: NestedFloatFilter<$PrismaModel>
+    _max?: NestedFloatFilter<$PrismaModel>
+  }
+
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
   export type ReportCreateWithoutConductorInput = {
     id?: string
     createdAt?: Date | string
@@ -6348,6 +8325,7 @@ export namespace Prisma {
     urgency?: $Enums.Urgency
     status?: $Enums.Status
     solution?: SolutionCreateNestedOneWithoutReportInput
+    candidates?: SolutionCandidateCreateNestedManyWithoutReportInput
     admin?: UserCreateNestedOneWithoutResolvedInput
   }
 
@@ -6363,6 +8341,7 @@ export namespace Prisma {
     status?: $Enums.Status
     adminId?: string | null
     solution?: SolutionUncheckedCreateNestedOneWithoutReportInput
+    candidates?: SolutionCandidateUncheckedCreateNestedManyWithoutReportInput
   }
 
   export type ReportCreateOrConnectWithoutConductorInput = {
@@ -6386,6 +8365,7 @@ export namespace Prisma {
     urgency?: $Enums.Urgency
     status?: $Enums.Status
     solution?: SolutionCreateNestedOneWithoutReportInput
+    candidates?: SolutionCandidateCreateNestedManyWithoutReportInput
     conductor: UserCreateNestedOneWithoutReportsInput
   }
 
@@ -6401,6 +8381,7 @@ export namespace Prisma {
     status?: $Enums.Status
     conductorId: string
     solution?: SolutionUncheckedCreateNestedOneWithoutReportInput
+    candidates?: SolutionCandidateUncheckedCreateNestedManyWithoutReportInput
   }
 
   export type ReportCreateOrConnectWithoutAdminInput = {
@@ -6474,6 +8455,8 @@ export namespace Prisma {
     embeddingModel?: string | null
     similarityScore?: number | null
     retrievedSources?: NullableJsonNullValueInput | InputJsonValue
+    confirmedAt?: Date | string | null
+    acknowledgedAt?: Date | string | null
   }
 
   export type SolutionUncheckedCreateWithoutReportInput = {
@@ -6488,11 +8471,51 @@ export namespace Prisma {
     embeddingModel?: string | null
     similarityScore?: number | null
     retrievedSources?: NullableJsonNullValueInput | InputJsonValue
+    confirmedAt?: Date | string | null
+    acknowledgedAt?: Date | string | null
   }
 
   export type SolutionCreateOrConnectWithoutReportInput = {
     where: SolutionWhereUniqueInput
     create: XOR<SolutionCreateWithoutReportInput, SolutionUncheckedCreateWithoutReportInput>
+  }
+
+  export type SolutionCandidateCreateWithoutReportInput = {
+    id?: string
+    createdAt?: Date | string
+    title: string
+    steps: string
+    action: string
+    detail: string
+    score: number
+    rank: number
+    sourceId: number
+    avgDelay?: number | null
+    timesUsed?: number | null
+  }
+
+  export type SolutionCandidateUncheckedCreateWithoutReportInput = {
+    id?: string
+    createdAt?: Date | string
+    title: string
+    steps: string
+    action: string
+    detail: string
+    score: number
+    rank: number
+    sourceId: number
+    avgDelay?: number | null
+    timesUsed?: number | null
+  }
+
+  export type SolutionCandidateCreateOrConnectWithoutReportInput = {
+    where: SolutionCandidateWhereUniqueInput
+    create: XOR<SolutionCandidateCreateWithoutReportInput, SolutionCandidateUncheckedCreateWithoutReportInput>
+  }
+
+  export type SolutionCandidateCreateManyReportInputEnvelope = {
+    data: SolutionCandidateCreateManyReportInput | SolutionCandidateCreateManyReportInput[]
+    skipDuplicates?: boolean
   }
 
   export type UserCreateWithoutReportsInput = {
@@ -6576,6 +8599,8 @@ export namespace Prisma {
     embeddingModel?: NullableStringFieldUpdateOperationsInput | string | null
     similarityScore?: NullableFloatFieldUpdateOperationsInput | number | null
     retrievedSources?: NullableJsonNullValueInput | InputJsonValue
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    acknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type SolutionUncheckedUpdateWithoutReportInput = {
@@ -6590,6 +8615,42 @@ export namespace Prisma {
     embeddingModel?: NullableStringFieldUpdateOperationsInput | string | null
     similarityScore?: NullableFloatFieldUpdateOperationsInput | number | null
     retrievedSources?: NullableJsonNullValueInput | InputJsonValue
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    acknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type SolutionCandidateUpsertWithWhereUniqueWithoutReportInput = {
+    where: SolutionCandidateWhereUniqueInput
+    update: XOR<SolutionCandidateUpdateWithoutReportInput, SolutionCandidateUncheckedUpdateWithoutReportInput>
+    create: XOR<SolutionCandidateCreateWithoutReportInput, SolutionCandidateUncheckedCreateWithoutReportInput>
+  }
+
+  export type SolutionCandidateUpdateWithWhereUniqueWithoutReportInput = {
+    where: SolutionCandidateWhereUniqueInput
+    data: XOR<SolutionCandidateUpdateWithoutReportInput, SolutionCandidateUncheckedUpdateWithoutReportInput>
+  }
+
+  export type SolutionCandidateUpdateManyWithWhereWithoutReportInput = {
+    where: SolutionCandidateScalarWhereInput
+    data: XOR<SolutionCandidateUpdateManyMutationInput, SolutionCandidateUncheckedUpdateManyWithoutReportInput>
+  }
+
+  export type SolutionCandidateScalarWhereInput = {
+    AND?: SolutionCandidateScalarWhereInput | SolutionCandidateScalarWhereInput[]
+    OR?: SolutionCandidateScalarWhereInput[]
+    NOT?: SolutionCandidateScalarWhereInput | SolutionCandidateScalarWhereInput[]
+    id?: UuidFilter<"SolutionCandidate"> | string
+    createdAt?: DateTimeFilter<"SolutionCandidate"> | Date | string
+    title?: StringFilter<"SolutionCandidate"> | string
+    steps?: StringFilter<"SolutionCandidate"> | string
+    action?: StringFilter<"SolutionCandidate"> | string
+    detail?: StringFilter<"SolutionCandidate"> | string
+    score?: FloatFilter<"SolutionCandidate"> | number
+    rank?: IntFilter<"SolutionCandidate"> | number
+    sourceId?: IntFilter<"SolutionCandidate"> | number
+    avgDelay?: IntNullableFilter<"SolutionCandidate"> | number | null
+    timesUsed?: IntNullableFilter<"SolutionCandidate"> | number | null
+    reportId?: UuidFilter<"SolutionCandidate"> | string
   }
 
   export type UserUpsertWithoutReportsInput = {
@@ -6672,6 +8733,7 @@ export namespace Prisma {
     trainId?: string | null
     urgency?: $Enums.Urgency
     status?: $Enums.Status
+    candidates?: SolutionCandidateCreateNestedManyWithoutReportInput
     conductor: UserCreateNestedOneWithoutReportsInput
     admin?: UserCreateNestedOneWithoutResolvedInput
   }
@@ -6688,6 +8750,7 @@ export namespace Prisma {
     status?: $Enums.Status
     conductorId: string
     adminId?: string | null
+    candidates?: SolutionCandidateUncheckedCreateNestedManyWithoutReportInput
   }
 
   export type ReportCreateOrConnectWithoutSolutionInput = {
@@ -6716,6 +8779,7 @@ export namespace Prisma {
     trainId?: NullableStringFieldUpdateOperationsInput | string | null
     urgency?: EnumUrgencyFieldUpdateOperationsInput | $Enums.Urgency
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    candidates?: SolutionCandidateUpdateManyWithoutReportNestedInput
     conductor?: UserUpdateOneRequiredWithoutReportsNestedInput
     admin?: UserUpdateOneWithoutResolvedNestedInput
   }
@@ -6732,6 +8796,83 @@ export namespace Prisma {
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
     conductorId?: StringFieldUpdateOperationsInput | string
     adminId?: NullableStringFieldUpdateOperationsInput | string | null
+    candidates?: SolutionCandidateUncheckedUpdateManyWithoutReportNestedInput
+  }
+
+  export type ReportCreateWithoutCandidatesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    content: string
+    imageUrl?: ReportCreateimageUrlInput | string[]
+    location: string
+    trainId?: string | null
+    urgency?: $Enums.Urgency
+    status?: $Enums.Status
+    solution?: SolutionCreateNestedOneWithoutReportInput
+    conductor: UserCreateNestedOneWithoutReportsInput
+    admin?: UserCreateNestedOneWithoutResolvedInput
+  }
+
+  export type ReportUncheckedCreateWithoutCandidatesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    content: string
+    imageUrl?: ReportCreateimageUrlInput | string[]
+    location: string
+    trainId?: string | null
+    urgency?: $Enums.Urgency
+    status?: $Enums.Status
+    conductorId: string
+    adminId?: string | null
+    solution?: SolutionUncheckedCreateNestedOneWithoutReportInput
+  }
+
+  export type ReportCreateOrConnectWithoutCandidatesInput = {
+    where: ReportWhereUniqueInput
+    create: XOR<ReportCreateWithoutCandidatesInput, ReportUncheckedCreateWithoutCandidatesInput>
+  }
+
+  export type ReportUpsertWithoutCandidatesInput = {
+    update: XOR<ReportUpdateWithoutCandidatesInput, ReportUncheckedUpdateWithoutCandidatesInput>
+    create: XOR<ReportCreateWithoutCandidatesInput, ReportUncheckedCreateWithoutCandidatesInput>
+    where?: ReportWhereInput
+  }
+
+  export type ReportUpdateToOneWithWhereWithoutCandidatesInput = {
+    where?: ReportWhereInput
+    data: XOR<ReportUpdateWithoutCandidatesInput, ReportUncheckedUpdateWithoutCandidatesInput>
+  }
+
+  export type ReportUpdateWithoutCandidatesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    content?: StringFieldUpdateOperationsInput | string
+    imageUrl?: ReportUpdateimageUrlInput | string[]
+    location?: StringFieldUpdateOperationsInput | string
+    trainId?: NullableStringFieldUpdateOperationsInput | string | null
+    urgency?: EnumUrgencyFieldUpdateOperationsInput | $Enums.Urgency
+    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    solution?: SolutionUpdateOneWithoutReportNestedInput
+    conductor?: UserUpdateOneRequiredWithoutReportsNestedInput
+    admin?: UserUpdateOneWithoutResolvedNestedInput
+  }
+
+  export type ReportUncheckedUpdateWithoutCandidatesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    content?: StringFieldUpdateOperationsInput | string
+    imageUrl?: ReportUpdateimageUrlInput | string[]
+    location?: StringFieldUpdateOperationsInput | string
+    trainId?: NullableStringFieldUpdateOperationsInput | string | null
+    urgency?: EnumUrgencyFieldUpdateOperationsInput | $Enums.Urgency
+    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    conductorId?: StringFieldUpdateOperationsInput | string
+    adminId?: NullableStringFieldUpdateOperationsInput | string | null
+    solution?: SolutionUncheckedUpdateOneWithoutReportNestedInput
   }
 
   export type ReportCreateManyConductorInput = {
@@ -6771,6 +8912,7 @@ export namespace Prisma {
     urgency?: EnumUrgencyFieldUpdateOperationsInput | $Enums.Urgency
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
     solution?: SolutionUpdateOneWithoutReportNestedInput
+    candidates?: SolutionCandidateUpdateManyWithoutReportNestedInput
     admin?: UserUpdateOneWithoutResolvedNestedInput
   }
 
@@ -6786,6 +8928,7 @@ export namespace Prisma {
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
     adminId?: NullableStringFieldUpdateOperationsInput | string | null
     solution?: SolutionUncheckedUpdateOneWithoutReportNestedInput
+    candidates?: SolutionCandidateUncheckedUpdateManyWithoutReportNestedInput
   }
 
   export type ReportUncheckedUpdateManyWithoutConductorInput = {
@@ -6812,6 +8955,7 @@ export namespace Prisma {
     urgency?: EnumUrgencyFieldUpdateOperationsInput | $Enums.Urgency
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
     solution?: SolutionUpdateOneWithoutReportNestedInput
+    candidates?: SolutionCandidateUpdateManyWithoutReportNestedInput
     conductor?: UserUpdateOneRequiredWithoutReportsNestedInput
   }
 
@@ -6827,6 +8971,7 @@ export namespace Prisma {
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
     conductorId?: StringFieldUpdateOperationsInput | string
     solution?: SolutionUncheckedUpdateOneWithoutReportNestedInput
+    candidates?: SolutionCandidateUncheckedUpdateManyWithoutReportNestedInput
   }
 
   export type ReportUncheckedUpdateManyWithoutAdminInput = {
@@ -6840,6 +8985,62 @@ export namespace Prisma {
     urgency?: EnumUrgencyFieldUpdateOperationsInput | $Enums.Urgency
     status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
     conductorId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SolutionCandidateCreateManyReportInput = {
+    id?: string
+    createdAt?: Date | string
+    title: string
+    steps: string
+    action: string
+    detail: string
+    score: number
+    rank: number
+    sourceId: number
+    avgDelay?: number | null
+    timesUsed?: number | null
+  }
+
+  export type SolutionCandidateUpdateWithoutReportInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    steps?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    detail?: StringFieldUpdateOperationsInput | string
+    score?: FloatFieldUpdateOperationsInput | number
+    rank?: IntFieldUpdateOperationsInput | number
+    sourceId?: IntFieldUpdateOperationsInput | number
+    avgDelay?: NullableIntFieldUpdateOperationsInput | number | null
+    timesUsed?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type SolutionCandidateUncheckedUpdateWithoutReportInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    steps?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    detail?: StringFieldUpdateOperationsInput | string
+    score?: FloatFieldUpdateOperationsInput | number
+    rank?: IntFieldUpdateOperationsInput | number
+    sourceId?: IntFieldUpdateOperationsInput | number
+    avgDelay?: NullableIntFieldUpdateOperationsInput | number | null
+    timesUsed?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type SolutionCandidateUncheckedUpdateManyWithoutReportInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    steps?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    detail?: StringFieldUpdateOperationsInput | string
+    score?: FloatFieldUpdateOperationsInput | number
+    rank?: IntFieldUpdateOperationsInput | number
+    sourceId?: IntFieldUpdateOperationsInput | number
+    avgDelay?: NullableIntFieldUpdateOperationsInput | number | null
+    timesUsed?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
 

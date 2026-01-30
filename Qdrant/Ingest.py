@@ -7,16 +7,18 @@ from typing import List
 
 import pandas as pd
 import random
+import google.generativeai as genai
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
-from sentence_transformers import SentenceTransformer
 
 # Constants
 DEFAULT_COLLECTION = "rail_incidents"
-EXPECTED_VECTOR_SIZE = 384
+EXPECTED_VECTOR_SIZE = 768  # Gemini text-embedding-004 dimensions
+GEMINI_EMBEDDING_MODEL = "models/text-embedding-004"
 
 # Configure logging
 LOG_LEVEL = os.environ.get("INGEST_LOG_LEVEL", "INFO").upper()
+
 logging.basicConfig(
     level=LOG_LEVEL,
     format="%(asctime)s | %(levelname)s | %(message)s",
@@ -118,19 +120,71 @@ def create_collection_safe(client: QdrantClient, collection_name: str) -> None:
         raise
 
 
-def build_points(df: pd.DataFrame, encoder: SentenceTransformer, strategies: List[dict]) -> List[PointStruct]:
+def generate_embedding(text: str) -> List[float]:
+    """Generate embedding using Gemini text-embedding-004"""
+    try:
+        result = genai.embed_content(
+            model=GEMINI_EMBEDDING_MODEL,
+            content=text,
+            task_type="retrieval_document",
+        )
+        return result['embedding']
+    except Exception as exc:
+        logger.error("Failed to generate embedding: %s", exc)
+        raise
+
+
+def select_strategy(description: str, damage: float, strategies: List[dict]) -> dict:
+    """
+    Select resolution strategy based on incident content analysis.
+    Uses heuristic rules - NOT random selection.
+    """
+    full_text = description.upper()
+    
+    # Heuristic-based selection
+    if damage > 100000:
+        return strategies[3]  # BUS_BRIDGE
+    elif "DERAILED" in full_text or "DERAIL" in full_text:
+        return strategies[2]  # SINGLE_LINE_WORKING
+    elif "SWITCH" in full_text or "TURNOUT" in full_text:
+        return strategies[0]  # REVERSE_MANEUVER
+    elif "COLLISION" in full_text or "STRUCK" in full_text:
+        return strategies[2]  # SINGLE_LINE_WORKING
+    elif "SIGNAL" in full_text or "CROSSING" in full_text:
+        return strategies[1]  # REROUTE_FAST_TRACK
+    elif "OBSTRUCTION" in full_text or "DEBRIS" in full_text or "OBJECT" in full_text:
+        return strategies[2] if damage > 50000 else strategies[1]
+    elif "FIRE" in full_text or "SMOKE" in full_text:
+        return strategies[3]  # BUS_BRIDGE
+    elif "WEATHER" in full_text or "FLOOD" in full_text or "SNOW" in full_text:
+        return strategies[1]  # REROUTE_FAST_TRACK
+    elif "MECHANICAL" in full_text or "BRAKE" in full_text or "ENGINE" in full_text:
+        return strategies[0]  # REVERSE_MANEUVER
+    elif "TRESPASS" in full_text or "PERSON" in full_text or "PEDESTRIAN" in full_text:
+        return strategies[2]  # SINGLE_LINE_WORKING
+    else:
+        # Default based on damage level
+        if damage > 50000:
+            return strategies[2]
+        elif damage > 10000:
+            return strategies[1]
+        else:
+            return strategies[0]
+
+
+def build_points(df: pd.DataFrame, strategies: List[dict]) -> List[PointStruct]:
     points: List[PointStruct] = []
 
     for idx, row in df.iterrows():
         try:
             text_to_embed = f"{row['Full_Description']} | Weather: {row['WEATHER']}"
-            vector = encoder.encode(text_to_embed)
+            vector = generate_embedding(text_to_embed)
 
             if len(vector) != EXPECTED_VECTOR_SIZE:
                 logger.error("Unexpected vector size %d for row %s", len(vector), idx)
                 raise ValueError(f"Unexpected vector size: {len(vector)}")
 
-            vector = vector.tolist()
+            # Gemini already returns a list, no need for tolist()
 
             accdmg = row['ACCDMG']
             try:
@@ -139,7 +193,8 @@ def build_points(df: pd.DataFrame, encoder: SentenceTransformer, strategies: Lis
                 logger.debug("Non-numeric ACCDMG '%s' for index %s; defaulting to 0", accdmg, idx)
                 accdmg_val = 0.0
 
-            strat = strategies[3] if accdmg_val > 100000 else random.choice(strategies)
+            # Use heuristic-based selection instead of random
+            strat = select_strategy(row['Full_Description'], accdmg_val, strategies)
 
             pts = PointStruct(
                 id=int(idx),
@@ -213,9 +268,14 @@ def main(argv: List[str] | None = None) -> int:
     try:
         df = load_data(args.csv, limit=args.limit)
 
-        # Initialize encoder and Qdrant
-        encoder = SentenceTransformer("all-MiniLM-L6-v2")
-        logger.info("Loaded encoder: all-MiniLM-L6-v2")
+        # Initialize Gemini API
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if not api_key:
+            logger.error("GEMINI_API_KEY environment variable is required")
+            raise ValueError("GEMINI_API_KEY not set. Export it before running: export GEMINI_API_KEY='your-key'")
+        
+        genai.configure(api_key=api_key)
+        logger.info("Configured Gemini API with model: %s", GEMINI_EMBEDDING_MODEL)
 
         client = init_vector_store(args.db_path)
         create_collection_safe(client, args.collection)
@@ -227,7 +287,7 @@ def main(argv: List[str] | None = None) -> int:
             {"action": "BUS_BRIDGE", "desc": "Track impassable. Deployed emergency bus fleet.", "delay": 120},
         ]
 
-        points = build_points(df, encoder, strategies)
+        points = build_points(df, strategies)
         upsert_in_batches(client, args.collection, points, batch_size=args.batch_size)
 
         logger.info("✅ Database Initialized Locally!")

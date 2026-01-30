@@ -81,10 +81,17 @@ export async function generateTextEmbedding(
  * For multimodal content (text + images), we create a rich text description
  * that includes image analysis, then embed the combined text.
  * 
+ * NOTE: Vision analysis is currently disabled to conserve API quota.
+ * When quota is available, set ENABLE_VISION_ANALYSIS to true.
+ * 
  * @param text - The text content
  * @param imageUrls - Array of public image URLs
  * @returns Embedding vector (768 dimensions)
  */
+
+// Set to true to enable vision analysis (uses extra API calls)
+const ENABLE_VISION_ANALYSIS = false;
+
 export async function generateMultimodalEmbedding(
   text: string,
   imageUrls: string[]
@@ -92,14 +99,14 @@ export async function generateMultimodalEmbedding(
   try {
     const genAI = getGeminiClient();
     
-    // If no images, use text-only embedding
-    if (!imageUrls || imageUrls.length === 0) {
-      console.log("[Gemini] No images provided, using text-only embedding");
+    // Skip vision analysis to conserve quota, or if no images
+    if (!ENABLE_VISION_ANALYSIS || !imageUrls || imageUrls.length === 0) {
+      console.log("[Gemini] Using text-only embedding (vision disabled or no images)");
       return generateTextEmbedding(text);
     }
     
-    // Use Gemini 2.0 Flash to analyze images and create enriched text
-    const visionModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    // Use Gemini 2.0 Flash Lite to analyze images (higher rate limits)
+    const visionModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
     
     // Fetch images and convert to base64
     const imageParts = await Promise.all(
@@ -175,7 +182,7 @@ Original report text: "${text}"`;
     return {
       success: true,
       embedding,
-      model: `${EMBEDDING_MODEL}+gemini-1.5-flash`,
+      model: `${EMBEDDING_MODEL}+gemini-2.0-flash-lite`,
       dimensions: embedding.length,
     };
   } catch (error) {

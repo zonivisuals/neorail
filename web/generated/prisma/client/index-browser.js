@@ -157,6 +157,23 @@ exports.Prisma.SolutionScalarFieldEnum = {
   embeddingModel: 'embeddingModel',
   similarityScore: 'similarityScore',
   retrievedSources: 'retrievedSources',
+  confirmedAt: 'confirmedAt',
+  acknowledgedAt: 'acknowledgedAt',
+  reportId: 'reportId'
+};
+
+exports.Prisma.SolutionCandidateScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  title: 'title',
+  steps: 'steps',
+  action: 'action',
+  detail: 'detail',
+  score: 'score',
+  rank: 'rank',
+  sourceId: 'sourceId',
+  avgDelay: 'avgDelay',
+  timesUsed: 'timesUsed',
   reportId: 'reportId'
 };
 
@@ -200,13 +217,16 @@ exports.Urgency = exports.$Enums.Urgency = {
 exports.Status = exports.$Enums.Status = {
   OPEN: 'OPEN',
   ANALYZING: 'ANALYZING',
+  PENDING_REVIEW: 'PENDING_REVIEW',
+  PENDING_CONDUCTOR: 'PENDING_CONDUCTOR',
   RESOLVED: 'RESOLVED'
 };
 
 exports.Prisma.ModelName = {
   User: 'User',
   Report: 'Report',
-  Solution: 'Solution'
+  Solution: 'Solution',
+  SolutionCandidate: 'SolutionCandidate'
 };
 
 /**

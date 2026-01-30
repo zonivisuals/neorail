@@ -15,6 +15,12 @@ import {
   ListChecks,
   Bell,
   LogOut,
+  Send,
+  Star,
+  Edit3,
+  ChevronDown,
+  ChevronUp,
+  UserCheck,
 } from "lucide-react";
 import { NeoRailLogo } from "@/lib/icons";
 import { logoutAction } from "@/app/(auth)/logout/actions";
@@ -25,14 +31,16 @@ import {
   type SolutionPayload,
 } from "@/hooks/useReportRealtime";
 import { analyzeSolution } from "@/app/actions/analyzeSolution";
-import { getReports } from "@/app/actions/getReports";
+import { confirmSolution } from "@/app/actions/confirmSolution";
+import { getReports, type SolutionCandidateData } from "@/app/actions/getReports";
 
 type ReportWithSolution = ReportPayload & {
   solution?: SolutionPayload | null;
+  candidates?: SolutionCandidateData[];
   isAnalyzing?: boolean;
 };
 
-type FilterTab = "all" | "active" | "analyzing" | "resolved";
+type FilterTab = "all" | "active" | "analyzing" | "pending_review" | "resolved";
 
 /**
  * Format date to relative time
@@ -92,6 +100,39 @@ function getUrgencyStyle(urgency: string) {
 }
 
 /**
+ * Get status styling
+ */
+function getStatusStyle(status: string) {
+  switch (status) {
+    case "RESOLVED":
+      return "bg-green-500/10 text-green-400 border-green-500/20";
+    case "ANALYZING":
+      return "bg-blue-500/10 text-blue-400 border-blue-500/20";
+    case "PENDING_REVIEW":
+      return "bg-purple-500/10 text-purple-400 border-purple-500/20";
+    case "PENDING_CONDUCTOR":
+      return "bg-cyan-500/10 text-cyan-400 border-cyan-500/20";
+    case "OPEN":
+    default:
+      return "bg-yellow-500/10 text-yellow-400 border-yellow-500/20";
+  }
+}
+
+/**
+ * Get human-readable status label
+ */
+function getStatusLabel(status: string) {
+  switch (status) {
+    case "PENDING_REVIEW":
+      return "Pending Review";
+    case "PENDING_CONDUCTOR":
+      return "Awaiting Conductor";
+    default:
+      return status;
+  }
+}
+
+/**
  * Status Icon Component
  */
 function StatusIcon({ status }: { status: string }) {
@@ -100,6 +141,10 @@ function StatusIcon({ status }: { status: string }) {
       return <CheckCircle2 size={12} className="text-green-400 shrink-0" />;
     case "ANALYZING":
       return <Loader2 size={12} className="text-blue-400 animate-spin shrink-0" />;
+    case "PENDING_REVIEW":
+      return <Star size={12} className="text-purple-400 shrink-0" />;
+    case "PENDING_CONDUCTOR":
+      return <UserCheck size={12} className="text-cyan-400 shrink-0" />;
     default:
       return <AlertCircle size={12} className="text-yellow-400 shrink-0" />;
   }
@@ -109,9 +154,16 @@ export default function AdminDashboardPage() {
   const [reports, setReports] = useState<Map<string, ReportWithSolution>>(new Map());
   const [isPending, startTransition] = useTransition();
   const [analyzingReportId, setAnalyzingReportId] = useState<string | null>(null);
+  const [confirmingCandidateId, setConfirmingCandidateId] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Editing state for solution confirmation
+  const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null);
+  const [editingTitle, setEditingTitle] = useState("");
+  const [editingSteps, setEditingSteps] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
 
   // Load existing reports on mount
   useEffect(() => {
@@ -126,6 +178,7 @@ export default function AdminDashboardPage() {
         for (const report of result.reports) {
           reportsMap.set(report.id, {
             ...report,
+            candidates: report.candidates,
             isAnalyzing: false,
           });
         }
@@ -213,9 +266,72 @@ export default function AdminDashboardPage() {
           return updated;
         });
         setAnalyzingReportId(null);
-        // The solution will arrive via realtime if successful
+      } else {
+        console.log("[Dashboard] Analysis succeeded, refreshing reports...");
+        // Refresh to get the new candidates from the database
+        const refreshResult = await getReports();
+        if (refreshResult.success) {
+          const reportsMap = new Map<string, ReportWithSolution>();
+          for (const report of refreshResult.reports) {
+            reportsMap.set(report.id, {
+              ...report,
+              candidates: report.candidates,
+              isAnalyzing: false,
+            });
+          }
+          setReports(reportsMap);
+          console.log("[Dashboard] Reports refreshed with new candidates");
+        }
+        setAnalyzingReportId(null);
       }
     });
+  };
+
+  // Handle confirm solution
+  const handleConfirmSolution = (candidateId: string, title: string, steps: string) => {
+    setConfirmingCandidateId(candidateId);
+    
+    startTransition(async () => {
+      const result = await confirmSolution(
+        candidateId,
+        isEditing ? editingTitle : undefined,
+        isEditing ? editingSteps : undefined
+      );
+      
+      if (result.success) {
+        console.log("[Dashboard] Solution confirmed:", result.solutionId);
+        // Reset editing state
+        setIsEditing(false);
+        setEditingTitle("");
+        setEditingSteps("");
+        setSelectedCandidateId(null);
+        // Refresh to get updated data - the realtime hook will update the solution
+        const refreshResult = await getReports();
+        if (refreshResult.success) {
+          const reportsMap = new Map<string, ReportWithSolution>();
+          for (const report of refreshResult.reports) {
+            reportsMap.set(report.id, {
+              ...report,
+              candidates: report.candidates,
+              isAnalyzing: false,
+            });
+          }
+          setReports(reportsMap);
+        }
+      } else {
+        console.error("[Dashboard] Confirmation failed:", result.error);
+      }
+      
+      setConfirmingCandidateId(null);
+    });
+  };
+
+  // Select a candidate for editing/confirmation
+  const handleSelectCandidate = (candidate: SolutionCandidateData) => {
+    setSelectedCandidateId(candidate.id);
+    setEditingTitle(candidate.title);
+    setEditingSteps(candidate.steps);
+    setIsEditing(false);
   };
 
   // Convert Map to array for rendering (newest first)
@@ -233,8 +349,12 @@ export default function AdminDashboardPage() {
         return reportsList.filter((r) => r.status === "OPEN");
       case "analyzing":
         return reportsList.filter((r) => r.status === "ANALYZING");
+      case "pending_review":
+        return reportsList.filter((r) => r.status === "PENDING_REVIEW");
       case "resolved":
-        return reportsList.filter((r) => r.status === "RESOLVED");
+        return reportsList.filter((r) => 
+          r.status === "RESOLVED" || r.status === "PENDING_CONDUCTOR"
+        );
       default:
         return reportsList;
     }
@@ -257,10 +377,14 @@ export default function AdminDashboardPage() {
   const statusCounts = useMemo(() => {
     return reportsList.reduce(
       (acc, report) => {
-        acc[report.status.toLowerCase() as "open" | "analyzing" | "resolved"]++;
+        const status = report.status.toLowerCase();
+        if (status === "open") acc.open++;
+        else if (status === "analyzing") acc.analyzing++;
+        else if (status === "pending_review") acc.pending_review++;
+        else if (status === "resolved" || status === "pending_conductor") acc.resolved++;
         return acc;
       },
-      { open: 0, analyzing: 0, resolved: 0 }
+      { open: 0, analyzing: 0, pending_review: 0, resolved: 0 }
     );
   }, [reportsList]);
 
@@ -326,6 +450,22 @@ export default function AdminDashboardPage() {
                 <span className="ml-auto hidden lg:block text-xs text-neutral-500">
                   {statusCounts.analyzing}
                 </span>
+              </button>
+              <button
+                onClick={() => setActiveFilter("pending_review")}
+                className={`flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors ${
+                  activeFilter === "pending_review"
+                    ? "bg-white/10 text-white"
+                    : "text-neutral-400 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                <Star size={18} className="shrink-0" />
+                <span className="hidden lg:block font-medium">Pending Review</span>
+                {statusCounts.pending_review > 0 && (
+                  <span className="ml-auto hidden lg:block text-xs bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded-full">
+                    {statusCounts.pending_review}
+                  </span>
+                )}
               </button>
               <button
                 onClick={() => setActiveFilter("resolved")}
@@ -444,14 +584,8 @@ export default function AdminDashboardPage() {
                 {selectedReport ? truncateContent(selectedReport.content) : "Admin Dashboard"}
               </span>
               {selectedReport && (
-                <span className={`px-2 py-0.5 text-[10px] rounded-full border ${
-                  selectedReport.status === "RESOLVED"
-                    ? "bg-green-500/10 text-green-400 border-green-500/20"
-                    : selectedReport.status === "ANALYZING"
-                    ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
-                    : "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"
-                }`}>
-                  {selectedReport.status}
+                <span className={`px-2 py-0.5 text-[10px] rounded-full border ${getStatusStyle(selectedReport.status)}`}>
+                  {getStatusLabel(selectedReport.status)}
                 </span>
               )}
             </nav>
@@ -472,22 +606,10 @@ export default function AdminDashboardPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-2">
                     <div
-                      className={`flex items-center gap-2 px-3 py-1.5 rounded-full border ${
-                        selectedReport.status === "RESOLVED"
-                          ? "bg-green-500/10 text-green-400 border-green-500/20"
-                          : selectedReport.status === "ANALYZING"
-                          ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
-                          : "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"
-                      }`}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-full border ${getStatusStyle(selectedReport.status)}`}
                     >
-                      {selectedReport.status === "RESOLVED" ? (
-                        <CheckCircle2 size={14} className="text-green-400" />
-                      ) : selectedReport.status === "ANALYZING" ? (
-                        <Loader2 size={14} className="text-blue-400 animate-spin" />
-                      ) : (
-                        <AlertCircle size={14} className="text-yellow-400" />
-                      )}
-                      <span className="text-xs font-medium">{selectedReport.status}</span>
+                      <StatusIcon status={selectedReport.status} />
+                      <span className="text-xs font-medium">{getStatusLabel(selectedReport.status)}</span>
                     </div>
                     <span className={`px-2 py-1 text-[10px] rounded-full border ${getUrgencyStyle(selectedReport.urgency)}`}>
                       {selectedReport.urgency} Priority
@@ -568,15 +690,22 @@ export default function AdminDashboardPage() {
                       <Sparkles size={16} className="text-green-400" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-semibold text-white">AI Solution</h3>
+                      <h3 className="text-sm font-semibold text-white">
+                        {selectedReport.status === "PENDING_CONDUCTOR" ? "Awaiting Conductor" : "Confirmed Solution"}
+                      </h3>
                       <p className="text-[10px] text-neutral-500">
-                        Generated {formatDate(selectedReport.solution.createdAt)}
+                        Confirmed {formatDate(selectedReport.solution.createdAt)}
                       </p>
                     </div>
                     {selectedReport.solution.confidence && (
                       <div className="ml-auto px-2 py-1 bg-green-500/10 rounded text-[10px] text-green-400">
                         {Math.round(selectedReport.solution.confidence * 100)}% confidence
                       </div>
+                    )}
+                    {selectedReport.status === "PENDING_CONDUCTOR" && (
+                      <span className="px-2 py-1 bg-cyan-500/10 text-cyan-400 rounded text-[10px]">
+                        Sent to Conductor
+                      </span>
                     )}
                   </div>
                   <div className="p-6 space-y-6">
@@ -613,13 +742,166 @@ export default function AdminDashboardPage() {
                     )}
                   </div>
                 </div>
+              ) : selectedReport.status === "PENDING_REVIEW" && selectedReport.candidates && selectedReport.candidates.length > 0 ? (
+                /* Solution Candidates Review Section */
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
+                      <Star size={16} className="text-purple-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-white">Review Solution Candidates</h3>
+                      <p className="text-[10px] text-neutral-500">
+                        Select and optionally edit a solution before sending to conductor
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Candidates Grid */}
+                  <div className="grid gap-4">
+                    {selectedReport.candidates.map((candidate, idx) => {
+                      const isSelected = selectedCandidateId === candidate.id;
+                      const isHighestConfidence = candidate.rank === 1;
+                      
+                      return (
+                        <div
+                          key={candidate.id}
+                          onClick={() => handleSelectCandidate(candidate)}
+                          className={`relative rounded-xl border transition-all cursor-pointer ${
+                            isSelected
+                              ? "bg-purple-500/10 border-purple-500/40 ring-2 ring-purple-500/30"
+                              : isHighestConfidence
+                              ? "bg-yellow-500/5 border-yellow-500/30 hover:border-yellow-500/50"
+                              : "bg-neutral-900/50 border-white/10 hover:border-white/20"
+                          }`}
+                        >
+                          {/* Recommended Badge */}
+                          {isHighestConfidence && (
+                            <div className="absolute -top-2 left-4 px-2 py-0.5 bg-yellow-500/20 border border-yellow-500/30 rounded-full flex items-center gap-1">
+                              <Star size={10} className="text-yellow-400 fill-yellow-400" />
+                              <span className="text-[10px] font-medium text-yellow-400">Recommended</span>
+                            </div>
+                          )}
+                          
+                          <div className="p-5">
+                            <div className="flex items-start justify-between gap-4 mb-3">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="text-xs font-mono text-neutral-500">#{candidate.rank}</span>
+                                  <h4 className="text-sm font-medium text-white">{candidate.title}</h4>
+                                </div>
+                                <p className="text-xs text-neutral-500">
+                                  Source ID: {candidate.sourceId} • Used {candidate.timesUsed ?? 0} times
+                                </p>
+                              </div>
+                              <div className={`px-2 py-1 rounded text-[10px] ${
+                                candidate.score > 0.8 
+                                  ? "bg-green-500/20 text-green-400"
+                                  : candidate.score > 0.6
+                                  ? "bg-yellow-500/20 text-yellow-400"
+                                  : "bg-neutral-500/20 text-neutral-400"
+                              }`}>
+                                {Math.round(candidate.score * 100)}% match
+                              </div>
+                            </div>
+                            
+                            <div className="text-xs text-neutral-400 line-clamp-3 mb-3">
+                              {candidate.steps}
+                            </div>
+                            
+                            {candidate.avgDelay && (
+                              <div className="text-[10px] text-neutral-500">
+                                Avg. resolution delay: {candidate.avgDelay} min
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Selection indicator */}
+                          {isSelected && (
+                            <div className="absolute top-4 right-4">
+                              <CheckCircle2 size={20} className="text-purple-400" />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  {/* Edit & Confirm Section */}
+                  {selectedCandidateId && (
+                    <div className="mt-6 p-5 bg-neutral-900/80 border border-white/10 rounded-xl space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-sm font-medium text-white">Prepare Solution</h4>
+                        <button
+                          onClick={() => setIsEditing(!isEditing)}
+                          className="flex items-center gap-1.5 text-xs text-neutral-400 hover:text-white transition-colors"
+                        >
+                          <Edit3 size={12} />
+                          {isEditing ? "Cancel Edit" : "Edit Before Sending"}
+                        </button>
+                      </div>
+                      
+                      {isEditing ? (
+                        <div className="space-y-4">
+                          <div>
+                            <label className="text-[10px] uppercase text-neutral-500 font-medium mb-1 block">
+                              Solution Title
+                            </label>
+                            <input
+                              type="text"
+                              value={editingTitle}
+                              onChange={(e) => setEditingTitle(e.target.value)}
+                              className="w-full px-3 py-2 bg-neutral-800 border border-white/10 rounded-lg text-sm text-white placeholder-neutral-500 focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30 outline-none"
+                              placeholder="Enter solution title..."
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] uppercase text-neutral-500 font-medium mb-1 block">
+                              Resolution Steps
+                            </label>
+                            <textarea
+                              value={editingSteps}
+                              onChange={(e) => setEditingSteps(e.target.value)}
+                              rows={5}
+                              className="w-full px-3 py-2 bg-neutral-800 border border-white/10 rounded-lg text-sm text-white placeholder-neutral-500 focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30 outline-none resize-none"
+                              placeholder="Describe the resolution steps..."
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-xs text-neutral-400">
+                          <p className="font-medium text-white mb-1">{editingTitle}</p>
+                          <p className="line-clamp-2">{editingSteps}</p>
+                        </div>
+                      )}
+                      
+                      <button
+                        onClick={() => handleConfirmSolution(selectedCandidateId, editingTitle, editingSteps)}
+                        disabled={isPending || confirmingCandidateId === selectedCandidateId}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 hover:bg-purple-500 disabled:bg-purple-800 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+                      >
+                        {confirmingCandidateId === selectedCandidateId ? (
+                          <>
+                            <Loader2 size={16} className="animate-spin" />
+                            <span>Sending to Conductor...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Send size={16} />
+                            <span>Confirm & Send to Conductor</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </div>
               ) : selectedReport.status === "ANALYZING" || selectedReport.isAnalyzing ? (
                 <div className="bg-blue-500/5 border border-blue-500/20 rounded-xl p-8 flex flex-col items-center gap-4">
                   <Loader2 size={32} className="text-blue-400 animate-spin" />
                   <div className="text-center">
                     <h3 className="text-sm font-medium text-white mb-1">Analyzing with AI...</h3>
                     <p className="text-xs text-neutral-500">
-                      Generating solution based on similar incidents
+                      Generating solution candidates based on similar incidents
                     </p>
                   </div>
                 </div>
@@ -638,7 +920,7 @@ export default function AdminDashboardPage() {
                     ) : (
                       <>
                         <Sparkles size={20} />
-                        <span>Analyze & Generate Solution</span>
+                        <span>Analyze & Generate Solutions</span>
                       </>
                     )}
                   </button>

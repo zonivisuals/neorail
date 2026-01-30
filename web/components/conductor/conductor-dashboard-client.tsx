@@ -84,10 +84,11 @@ export function ConductorDashboardClient() {
               source: solution.source as string,
               confidence: solution.confidence as number | null,
               createdAt: solution.createdAt as string,
+              acknowledgedAt: solution.acknowledgedAt as string | null | undefined,
             });
 
-            // Also update report status
-            updateReport(solution.reportId as string, { status: "RESOLVED" });
+            // Also update report status - now goes to PENDING_CONDUCTOR
+            updateReport(solution.reportId as string, { status: "PENDING_CONDUCTOR" });
           }
         }
       )

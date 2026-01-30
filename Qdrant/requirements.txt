@@ -1,0 +1,17 @@
+# Core dependencies
+fastapi>=0.104.0
+uvicorn>=0.24.0
+qdrant-client>=1.7.0
+pandas>=2.0.0
+
+# Embedding providers (choose one or both)
+# OpenCLIP - Local embeddings (recommended - no rate limits)
+open-clip-torch>=2.24.0
+torch>=2.0.0
+pillow>=10.0.0
+
+# Gemini - Cloud API (has rate limits on free tier)
+google-generativeai>=0.3.0
+
+# Utilities
+requests>=2.31.0

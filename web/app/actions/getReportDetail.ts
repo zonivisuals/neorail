@@ -77,6 +77,7 @@ export async function getReportDetail(reportId: string): Promise<GetReportResult
         source: report.solution.source,
         confidence: report.solution.confidence,
         createdAt: report.solution.createdAt.toISOString(),
+        acknowledgedAt: report.solution.acknowledgedAt?.toISOString() ?? null,
       } : null,
     };
 
@@ -145,6 +146,7 @@ export async function getConductorReportsWithSolutions(): Promise<{
         source: report.solution.source,
         confidence: report.solution.confidence,
         createdAt: report.solution.createdAt.toISOString(),
+        acknowledgedAt: report.solution.acknowledgedAt?.toISOString() ?? null,
       } : null,
     }));
 

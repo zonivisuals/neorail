@@ -11,7 +11,7 @@ export type ConductorReport = {
   content: string;
   location: string;
   urgency: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
-  status: "OPEN" | "ANALYZING" | "RESOLVED";
+  status: "OPEN" | "ANALYZING" | "PENDING_REVIEW" | "PENDING_CONDUCTOR" | "RESOLVED";
   trainId: string | null;
   imageUrl: string[];
   solution?: {
@@ -21,6 +21,7 @@ export type ConductorReport = {
     source: string;
     confidence: number | null;
     createdAt: string;
+    acknowledgedAt?: string | null;
   } | null;
 };
 

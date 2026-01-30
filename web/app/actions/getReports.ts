@@ -9,6 +9,21 @@
 
 import { prismaClient as prisma } from "@/lib/prisma";
 
+export type SolutionCandidateData = {
+  id: string;
+  createdAt: string;
+  title: string;
+  steps: string;
+  action: string;
+  detail: string;
+  score: number;
+  rank: number;
+  sourceId: number;
+  avgDelay: number | null;
+  timesUsed: number | null;
+  reportId: string;
+};
+
 export type ReportWithSolutionData = {
   id: string;
   createdAt: string;
@@ -18,7 +33,7 @@ export type ReportWithSolutionData = {
   location: string;
   trainId: string | null;
   urgency: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
-  status: "OPEN" | "ANALYZING" | "RESOLVED";
+  status: "OPEN" | "ANALYZING" | "PENDING_REVIEW" | "PENDING_CONDUCTOR" | "RESOLVED";
   conductorId: string;
   adminId: string | null;
   solution: {
@@ -33,7 +48,10 @@ export type ReportWithSolutionData = {
     retrievalMethod: string | null;
     retrievedSources: unknown;
     reportId: string;
+    confirmedAt: string | null;
+    acknowledgedAt: string | null;
   } | null;
+  candidates: SolutionCandidateData[];
 };
 
 export type GetReportsResult = {
@@ -54,6 +72,9 @@ export async function getReports(): Promise<GetReportsResult> {
       orderBy: { createdAt: "desc" },
       include: {
         solution: true,
+        candidates: {
+          orderBy: { rank: "asc" },
+        },
       },
     });
 
@@ -83,7 +104,24 @@ export async function getReports(): Promise<GetReportsResult> {
         retrievalMethod: report.solution.retrievalMethod,
         retrievedSources: report.solution.retrievedSources,
         reportId: report.solution.reportId,
+        confirmedAt: report.solution.confirmedAt?.toISOString() ?? null,
+        acknowledgedAt: report.solution.acknowledgedAt?.toISOString() ?? null,
       } : null,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      candidates: (report.candidates ?? []).map((c: any) => ({
+        id: c.id,
+        createdAt: c.createdAt.toISOString(),
+        title: c.title,
+        steps: c.steps,
+        action: c.action,
+        detail: c.detail,
+        score: c.score,
+        rank: c.rank,
+        sourceId: c.sourceId,
+        avgDelay: c.avgDelay,
+        timesUsed: c.timesUsed,
+        reportId: c.reportId,
+      })),
     }));
 
     return {

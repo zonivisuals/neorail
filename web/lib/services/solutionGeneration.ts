@@ -9,8 +9,19 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { SimilarIncident } from "./vectorSearch";
 
-// Gemini model for solution generation
-const SOLUTION_MODEL = "gemini-2.0-flash";
+// Gemini model for solution generation (using 2.0-flash-lite for higher rate limits)
+const SOLUTION_MODEL = "gemini-2.0-flash-lite";
+
+// Retry configuration for rate limiting
+const MAX_RETRIES = 3;
+const INITIAL_RETRY_DELAY_MS = 5000; // 5 seconds
+
+/**
+ * Sleep utility for retry delays
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export type GeneratedSolution = {
   title: string;
@@ -112,55 +123,85 @@ Respond with ONLY the JSON object, no additional text.`;
 
     console.log("[SolutionGen] Generating solution with Gemini...");
     
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
+    // Retry loop with exponential backoff for rate limiting
+    let lastError: Error | null = null;
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        if (attempt > 0) {
+          const delay = INITIAL_RETRY_DELAY_MS * Math.pow(2, attempt - 1);
+          console.log(`[SolutionGen] Retry attempt ${attempt + 1}/${MAX_RETRIES} after ${delay}ms...`);
+          await sleep(delay);
+        }
+        
+        const result = await model.generateContent(prompt);
+        const responseText = result.response.text();
     
-    // Parse JSON response
-    let parsedSolution: { title: string; steps: string };
-    try {
-      // Clean up the response (remove markdown code blocks if present)
-      const cleanedResponse = responseText
-        .replace(/```json\n?/g, "")
-        .replace(/```\n?/g, "")
-        .trim();
-      
-      parsedSolution = JSON.parse(cleanedResponse);
-    } catch (parseError) {
-      console.error("[SolutionGen] Failed to parse JSON response:", responseText);
-      
-      // Fallback: extract content manually
-      parsedSolution = {
-        title: "Incident Response Required",
-        steps: responseText,
-      };
+        // Parse JSON response
+        let parsedSolution: { title: string; steps: string };
+        try {
+          // Clean up the response (remove markdown code blocks if present)
+          const cleanedResponse = responseText
+            .replace(/```json\n?/g, "")
+            .replace(/```\n?/g, "")
+            .trim();
+          
+          parsedSolution = JSON.parse(cleanedResponse);
+        } catch (parseError) {
+          console.error("[SolutionGen] Failed to parse JSON response:", responseText);
+          
+          // Fallback: extract content manually
+          parsedSolution = {
+            title: "Incident Response Required",
+            steps: responseText,
+          };
+        }
+        
+        // Determine source based on similar incidents
+        let source: string;
+        if (similarIncidents.length > 0 && avgScore > 0.7) {
+          source = "vector-search-high-confidence";
+        } else if (similarIncidents.length > 0) {
+          source = "vector-search-partial-match";
+        } else {
+          source = "llm-generated";
+        }
+        
+        // Calculate confidence (combination of similarity scores and match count)
+        const confidence = Math.min(
+          avgScore * 0.7 + (similarIncidents.length > 0 ? 0.3 : 0),
+          1.0
+        );
+        
+        console.log(`[SolutionGen] Solution generated: "${parsedSolution.title}" (confidence: ${(confidence * 100).toFixed(1)}%)`);
+        
+        return {
+          success: true,
+          solution: {
+            title: parsedSolution.title,
+            steps: parsedSolution.steps,
+            source,
+            confidence,
+          },
+        };
+      } catch (retryError) {
+        lastError = retryError instanceof Error ? retryError : new Error(String(retryError));
+        const isRateLimit = lastError.message.includes("429") || lastError.message.includes("quota");
+        
+        if (isRateLimit && attempt < MAX_RETRIES - 1) {
+          console.log(`[SolutionGen] Rate limited, will retry...`);
+          continue;
+        }
+        
+        // Non-rate-limit error or final attempt
+        break;
+      }
     }
     
-    // Determine source based on similar incidents
-    let source: string;
-    if (similarIncidents.length > 0 && avgScore > 0.7) {
-      source = "vector-search-high-confidence";
-    } else if (similarIncidents.length > 0) {
-      source = "vector-search-partial-match";
-    } else {
-      source = "llm-generated";
-    }
-    
-    // Calculate confidence (combination of similarity scores and match count)
-    const confidence = Math.min(
-      avgScore * 0.7 + (similarIncidents.length > 0 ? 0.3 : 0),
-      1.0
-    );
-    
-    console.log(`[SolutionGen] Solution generated: "${parsedSolution.title}" (confidence: ${(confidence * 100).toFixed(1)}%)`);
-    
+    // All retries failed
+    console.error("[SolutionGen] All retries failed:", lastError);
     return {
-      success: true,
-      solution: {
-        title: parsedSolution.title,
-        steps: parsedSolution.steps,
-        source,
-        confidence,
-      },
+      success: false,
+      error: lastError?.message || "Solution generation failed after retries",
     };
   } catch (error) {
     console.error("[SolutionGen] Error:", error);
